@@ -44,11 +44,6 @@ A special thanks to everyone who has contributed to making `discord-catbot-base`
 ---
 
 Made with 💖 and 😺 by [ThePolishCat](https://github.com/ThePolishCat)<br>
-<details>
-
-<summary>Credits</summary>
- [AI readme generator](https://www.yeschat.ai/gpts-ZxWzhxpq-README-Generator)<br>
- [Base code](https://discord.com/invite/E6AJ7eNrsd)<br>
-
-</details>
-
+Credits:
+[AI readme generator](https://www.yeschat.ai/gpts-ZxWzhxpq-README-Generator)<br>
+[Base code](https://discord.com/invite/E6AJ7eNrsd)<br>
