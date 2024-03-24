@@ -1,11 +1,6 @@
 const {
   Client,
   GatewayIntentBits,
-  EmbedBuilder,
-  PermissionsBitField,
-  Permissions,
-  MessageManager,
-  Embed,
   Collection,
 } = require(`discord.js`);
 const fs = require("fs");
@@ -33,7 +28,7 @@ const commandFolders = fs.readdirSync("./commands");
   for (file of functions) {
     require(`./functions/${file}`)(client);
   }
-  client.handleEvents(eventFiles, "./events");
+  client.handleEvents(eventFiles);
   client.handleCommands(commandFolders, "./commands");
   client.login(process.env.token);
 })();
