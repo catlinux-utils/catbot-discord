@@ -9,7 +9,7 @@ module.exports = {
     const queue = await client.distube.getQueue(voiceChannel);
     if (!queue) return;
     const song = queue.songs[0];
-
+    
     const status = (queue) =>
       `Volume: \`${queue.volume}%\` | Filter: \`${
         queue.filters.names.join(", ") || "Off"
