@@ -8,6 +8,7 @@ Welcome to **discord-catbot-base**! This project is a foundational framework for
 - **Interactive Cat Commands**: Users can interact with the bot for cat-related content.
 - **Customizability**: Easily customizable to add your own unique bot features.
 - **Scalability**: Designed to grow as your Discord server grows.
+- **Music**: Play music in your server with the bot.
 
 ## Installation 🛠️
 To install `discord-catbot-base`, follow these steps:
@@ -43,7 +44,4 @@ A special thanks to everyone who has contributed to making `discord-catbot-base`
 
 ---
 
-Made with 💖 and 😺 by [ThePolishCat](https://github.com/ThePolishCat)<br>
-Credits: <br>
-[AI readme generator](https://www.yeschat.ai/gpts-ZxWzhxpq-README-Generator)<br>
-[Base code](https://discord.com/invite/E6AJ7eNrsd)<br>
+Made with 💖 and 😺 by [ThePolishCat](https://github.com/ThePolishCat)
