@@ -15,9 +15,9 @@ module.exports = (client) => {
         const command = require(`../commands/${folder}/${file}`);
         client.commands.set(command.data.name, command);
         if (command.data instanceof SlashCommandBuilder) {
-          client.commandArray.push(command.data.toJSON());
+          client.commandArray.push(command.data.toJSON()); //for normal commands
         } else {
-          client.commandArray.push(command.data);
+          client.commandArray.push(command.data); //for user commands
         }
       }
     }
