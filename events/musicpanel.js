@@ -9,7 +9,7 @@ module.exports = {
     const queue = await client.distube.getQueue(voiceChannel);
     if (!queue) return;
     const song = queue.songs[0];
-    
+
     const status = (queue) =>
       `Volume: \`${queue.volume}%\` | Filter: \`${
         queue.filters.names.join(", ") || "Off"
@@ -38,7 +38,7 @@ module.exports = {
       if (!queue) return;
 
       if (interaction.customId === "pause") {
-        if(!queue.pause)return
+        if (!queue.pause) return;
         client.distube.pause(interaction.guild);
         await interaction.update({
           embeds: [
@@ -52,7 +52,7 @@ module.exports = {
           ],
         });
       } else if (interaction.customId === "resume") {
-        if (queue.pause) {
+        if (!queue.pause) {
         } else {
           client.distube.resume(interaction.guild);
           await interaction.update({
