@@ -1,7 +1,6 @@
 const DDG = require("duck-duck-scrape");
 const { EmbedBuilder } = require("discord.js");
 module.exports = {
-  data: {
     name: "search",
     description: "Search web",
     integration_types: [1],
@@ -14,8 +13,7 @@ module.exports = {
         required: true,
       },
     ],
-  },
-  async execute(interaction) {
+  run: async(interaction)=> {
     const query = interaction.options.getString("query");
     const results = (await DDG.search(query, { locale: "pl_PL", region: "pl" }))
       .results;

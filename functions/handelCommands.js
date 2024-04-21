@@ -1,43 +1,29 @@
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
 const { SlashCommandBuilder } = require("@discordjs/builders");
-require("dotenv").config();
 const fs = require("fs");
 
-module.exports = (client) => {
-  client.handleCommands = async (commandFolders, path) => {
-    client.commandArray = [];
-    for (folder of commandFolders) {
-      const commandFiles = fs
-        .readdirSync(`${path}/${folder}`)
-        .filter((file) => file.endsWith(".js"));
-      for (const file of commandFiles) {
-        const command = require(`../commands/${folder}/${file}`);
+module.exports = async (client) => {
+  client.commandArray = [];
+  const commandFolders = fs.readdirSync("./commands");
+  for (folder of commandFolders) {
+    const commandFiles = fs
+      .readdirSync(`./commands/${folder}`)
+      .filter((file) => file.endsWith(".js"));
+    for (const file of commandFiles) {
+      const command = require(`../commands/${folder}/${file}`);
+      if (command.data) {
         client.commands.set(command.data.name, command);
-        if (command.data instanceof SlashCommandBuilder) {
-          client.commandArray.push(command.data.toJSON()); //for normal commands
-        } else {
-          client.commandArray.push(command.data); //for user commands
-        }
+      } else {
+        client.commands.set(command.name, command);
+      }
+      if (command.data instanceof SlashCommandBuilder) {
+        client.commandArray.push(command.data.toJSON()); //for user commands
+      } else {
+        client.commandArray.push(command.data); //for normal commands
       }
     }
+  }
 
-    const rest = new REST({
-      version: "9",
-    }).setToken(process.env.token);
-
-    (async () => {
-      try {
-        console.log("Started refreshing application (/) commands.");
-
-        await rest.put(Routes.applicationCommands(process.env.clientId), {
-          body: client.commandArray,
-        });
-
-        console.log("Successfully reloaded application (/) commands.");
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  };
+  client.on("ready", async () => {
+    await client.application.commands.set(client.commandArray);
+  });
 };
