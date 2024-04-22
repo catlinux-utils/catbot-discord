@@ -1,59 +1,56 @@
 const {
   EmbedBuilder,
-  SlashCommandBuilder,
-  PermissionFlagsBits,
-  VoiceChannel,
-  GuildEmoji,
+  ApplicationCommandOptionType,
 } = require("discord.js");
 const client = require("../../index");
 
 module.exports = {
-  data: new SlashCommandBuilder()
-    .setName("music")
-    .setDescription("Complete music system.")
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("play")
-        .setDescription("Play a song.")
-        .addStringOption((option) =>
-          option
-            .setName("query")
-            .setDescription("Provide the name of the url for the song.")
-            .setRequired(true)
-        )
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("volume")
-        .setDescription("Adjust the song volume.")
-        .addNumberOption((option) =>
-          option
-            .setName("percent")
-            .setDescription("10 = 10%")
-            .setMinValue(1)
-            .setMaxValue(100)
-            .setRequired(true)
-        )
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("options")
-        .setDescription("Select an option.")
-        .addStringOption((option) =>
-          option
-            .setName("options")
-            .setDescription("Select an option.")
-            .setRequired(true)
-            .addChoices(
-              { name: "queue", value: "queue" },
-              { name: "skip", value: "skip" },
-              { name: "pause", value: "pause" },
-              { name: "resume", value: "resume" },
-              { name: "stop", value: "stop" }
-            )
-        )
-    ),
-  async execute(interaction, client) {
+  name: "music",
+  description: "Complete music system.",
+  options: [{
+    name: "play",
+    description: "Play a song.",
+    type: ApplicationCommandOptionType.Subcommand,
+    options: [{
+      name: "query",
+      description: "Provide the name of the url for the song.",
+      type: ApplicationCommandOptionType.String,
+      required: true,
+    }]
+  },
+  {
+    name: "volume",
+    description: "Adjust the song volume.",
+    type: ApplicationCommandOptionType.Subcommand,
+    options: [{
+      name: "percent",
+      description: "10 = 10%",
+      type: ApplicationCommandOptionType.Number,
+      min_value: 1,
+      max_value: 100,
+      required: true,
+    }]
+  },
+  {
+    name: "options",
+    description: "Select an option.",
+    type: ApplicationCommandOptionType.Subcommand,
+    options: [{
+      name: "options",
+      description: "Select an option.",
+      type: ApplicationCommandOptionType.String,
+      choices: [
+        { name: "queue", value: "queue" },
+        { name: "skip", value: "skip" },
+        { name: "pause", value: "pause" },
+        { name: "resume", value: "resume" },
+        { name: "stop", value: "stop" }
+      ],
+      required: true,
+    }]
+  },
+  ],
+  run: async (interaction, client) => {
     const { options, member, guild, channel } = interaction;
 
     const subcommand = options.getSubcommand();
@@ -131,8 +128,7 @@ module.exports = {
                 .setDescription(
                   `${queue.songs.map(
                     (song, id) =>
-                      `\n**${id + 1}.** ${song.name} -\` ${
-                        song.formattedDuration
+                      `\n**${id + 1}.** ${song.name} -\` ${song.formattedDuration
                       } \``
                   )}`
                 );

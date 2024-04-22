@@ -5,7 +5,7 @@ const {
   EmbedBuilder,
 } = require(`discord.js`);
 const { DisTube } = require("distube");
-const { SpotifyPlugin } = require("@distube/spotify");
+//const { SpotifyPlugin } = require("@distube/spotify");
 const fs = require("fs");
 const client = new Client({
   intents: [

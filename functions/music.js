@@ -5,7 +5,7 @@ const {
   ButtonStyle,
 } = require("discord.js");
 const { DisTube } = require("distube");
-const { SpotifyPlugin } = require("@distube/spotify");
+//const { SpotifyPlugin } = require("@distube/spotify");
 
 const pauseButton = new ButtonBuilder()
   .setCustomId("pause")
@@ -66,7 +66,7 @@ module.exports = (client) => {
     emitNewSongOnly: true,
     leaveOnFinish: true,
     emitAddListWhenCreatingQueue: false,
-    plugins: [new SpotifyPlugin()],
+    //plugins: [new SpotifyPlugin()],
   });
 
   const status = (queue) =>
