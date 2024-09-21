@@ -5,7 +5,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("allguilds")
     .setDescription("All guilds")
-    .setIntegrationTypes([1])
+    .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   ownerOnly: true,
   run: async (interaction, client) => {

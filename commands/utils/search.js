@@ -5,7 +5,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("search")
     .setDescription("Search web")
-    .setIntegrationTypes([1])
+    .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2])
     .addStringOption((option) =>
       option

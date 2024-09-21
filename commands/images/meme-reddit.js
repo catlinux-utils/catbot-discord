@@ -6,7 +6,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("meme")
     .setDescription("Meme command.")
-    .setIntegrationTypes([1])
+    .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
     const response = await axios.get(
