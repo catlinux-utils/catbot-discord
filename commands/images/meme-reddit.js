@@ -1,7 +1,5 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
-const { SlashCommandBuilder } = require("discord.js");
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("meme")

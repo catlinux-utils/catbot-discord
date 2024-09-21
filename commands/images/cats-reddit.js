@@ -1,11 +1,9 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const axios = require("axios");
-const { SlashCommandBuilder } = require("discord.js");
-
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("cats")
-    .setDescription("Cats command.")
+    .setDescription("Cats images.")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {

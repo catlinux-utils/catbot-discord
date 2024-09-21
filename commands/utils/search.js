@@ -1,6 +1,5 @@
 const DDG = require("duck-duck-scrape");
-const { EmbedBuilder } = require("discord.js");
-const { SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("search")
