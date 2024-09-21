@@ -1,9 +1,13 @@
 const { EmbedBuilder } = require("discord.js");
 const axios = require("axios");
+const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
-  name: "meme",
-  description: "Meme command.",
+  data: new SlashCommandBuilder()
+    .setName("meme")
+    .setDescription("Meme command.")
+    .setIntegrationTypes([1])
+    .setContexts([0, 1, 2]),
   run: async (interaction) => {
     const response = await axios.get(
       "https://api.reddit.com/r/memes/random/.json"

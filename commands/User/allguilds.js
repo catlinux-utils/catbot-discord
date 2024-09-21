@@ -1,19 +1,19 @@
 require("dotenv").config();
 
+const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
-  name: "guilds22",
-  description: "All guilds",
-  integration_types: [1],
-  contexts: [0, 1, 2],
+  data: new SlashCommandBuilder()
+    .setName("allguilds")
+    .setDescription("All guilds")
+    .setIntegrationTypes([1])
+    .setContexts([0, 1, 2]),
+  ownerOnly: true,
   run: async (interaction, client) => {
-    if (interaction.user.id !== "779313277775380490") {
-      return interaction.reply({ content: "You are not allowed to use this command" });
-    }
-    let list;
+    let list = "Guilds:\n";
     client.guilds.cache.forEach((guild) => {
-      list += `${guild.name} (${guild.id}) | ${guild.memberCount} Members | Owner: ${guild.ownerId}\n`;
+      list += ` - ${guild.name} (${guild.id}) - ${guild.memberCount} Members - Owner: ${guild.ownerId}\n`;
     });
 
-    await interaction.reply({ content: list });
+    await interaction.reply({ content: list, ephemeral: true });
   },
 };

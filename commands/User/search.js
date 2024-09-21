@@ -1,19 +1,19 @@
 const DDG = require("duck-duck-scrape");
 const { EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
-    name: "search",
-    description: "Search web",
-    integration_types: [1],
-    contexts: [0, 1, 2],
-    options: [
-      {
-        name: "query",
-        description: "Query to search",
-        type: 3,
-        required: true,
-      },
-    ],
-  run: async(interaction)=> {
+  data: new SlashCommandBuilder()
+    .setName("search")
+    .setDescription("Search web")
+    .setIntegrationTypes([1])
+    .setContexts([0, 1, 2])
+    .addStringOption((option) =>
+      option
+        .setName("query")
+        .setDescription("Query to search")
+        .setRequired(true)
+    ),
+  run: async (interaction) => {
     const query = interaction.options.getString("query");
     const results = (await DDG.search(query, { locale: "pl_PL", region: "pl" }))
       .results;
@@ -32,5 +32,3 @@ module.exports = {
     await interaction.reply({ embeds: [embed] });
   },
 };
-
-

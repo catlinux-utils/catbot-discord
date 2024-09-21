@@ -1,8 +1,10 @@
-const { EmbedBuilder } = require("discord.js");
-
+const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
-  name: "rolldice",
-  description: "Rolls a dice.",
+  data: new SlashCommandBuilder()
+    .setName("rolldice")
+    .setDescription("Rolls a dice.")
+    .setIntegrationTypes([0])
+    .setContexts([0, 1, 2]),
   run: async (interaction) => {
     const roll = Math.floor(Math.random() * 6) + 1;
     await interaction.reply("You rolled a " + roll);
