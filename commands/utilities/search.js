@@ -28,6 +28,9 @@ module.exports = {
         icon: "https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png",
       })
       .setColor("Random");
-    await interaction.reply({ embeds: [embed] });
+
+    await interaction.reply({
+      embeds: [embed],
+    });
   },
 };
