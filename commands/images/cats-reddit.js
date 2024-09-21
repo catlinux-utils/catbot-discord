@@ -15,16 +15,32 @@ module.exports = {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
-    const response = await axios.get(
-      "https://api.reddit.com/r/cats/random/.json"
-    );
-    const responseData = response.data[0].data.children[0].data;
+    const { image, title } = await getRandomCat();
 
-    const memeimage = responseData.url_overridden_by_dest;
-    const memetitle = responseData.title;
+    function getRandomCat() {
+      return new Promise(async (resolve, reject) => {
+        let image;
+        let title;
+        do {
+          const response = await axios.get(
+            "https://api.reddit.com/r/cats/random/.json"
+          );
+          const responseData = response.data[0].data.children[0].data;
+
+          image = responseData.url_overridden_by_dest;
+          title = responseData.title;
+        } while (
+          !image ||
+          image.startsWith("https://v.redd.it/") ||
+          image.includes("/gallery/")
+        );
+
+        resolve({ image, title });
+      });
+    }
     const embed = new EmbedBuilder()
-      .setTitle(`${memetitle}`)
-      .setImage(memeimage)
+      .setTitle(`${title}`)
+      .setImage(image)
       .setFooter({ text: `From r/cats` })
       .setColor("Random");
 
@@ -43,22 +59,17 @@ module.exports = {
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 15_000,
+      time: 300_000,
       filter,
     });
 
     collector.on("collect", async (i) => {
       if (i.customId === "next") {
-        const response = await axios.get(
-          "https://api.reddit.com/r/cats/random/.json"
-        );
-        const responseData = response.data[0].data.children[0].data;
-
-        const memeimage = responseData.url_overridden_by_dest;
-        const memetitle = responseData.title;
+        await i.deferUpdate();
+        const { image, title } = await getRandomCat();
         const embed = new EmbedBuilder()
-          .setTitle(`${memetitle}`)
-          .setImage(memeimage)
+          .setTitle(`${title}`)
+          .setImage(image)
           .setFooter({ text: `From r/cats` })
           .setColor("Random");
         message.edit({
