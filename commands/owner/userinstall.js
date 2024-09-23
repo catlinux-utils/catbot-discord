@@ -1,5 +1,3 @@
-const client = require("../../index");
-
 const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
