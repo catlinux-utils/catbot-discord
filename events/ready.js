@@ -1,7 +1,5 @@
-module.exports = {
-  name: "ready",
-  once: true,
-  async execute(client) {
-    console.log("Ready!");
-  },
+export default (client) => {
+  client.on("ready", async () => {
+    console.log(`Logged in as ${client.user.tag}!`);
+  });
 };

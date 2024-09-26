@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require("discord.js");
-module.exports = {
+import { SlashCommandBuilder } from "discord.js";
+
+export default {
   data: new SlashCommandBuilder()
     .setName("allusers")
     .setDescription("show all users")

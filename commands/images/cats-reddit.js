@@ -1,14 +1,14 @@
-const {
+import {
   EmbedBuilder,
   SlashCommandBuilder,
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
   ComponentType,
-  Integration,
-} = require("discord.js");
-const axios = require("axios");
-module.exports = {
+} from "discord.js";
+import axios from "axios";
+
+export default {
   data: new SlashCommandBuilder()
     .setName("cats")
     .setDescription("Cats images.")

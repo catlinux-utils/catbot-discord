@@ -1,6 +1,7 @@
-const DDG = require("duck-duck-scrape");
-const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
-module.exports = {
+import DDG from "duck-duck-scrape";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+
+export default {
   data: new SlashCommandBuilder()
     .setName("search")
     .setDescription("Search web")

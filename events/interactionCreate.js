@@ -1,7 +1,7 @@
-require("dotenv").config();
-module.exports = {
-  name: "interactionCreate",
-  async execute(interaction, client) {
+import "dotenv/config";
+
+export default (client) => {
+  client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
       const command = client.commands.get(interaction.commandName);
       if (!command) return;
@@ -24,5 +24,5 @@ module.exports = {
         });
       }
     }
-  },
+  });
 };

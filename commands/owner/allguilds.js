@@ -1,7 +1,6 @@
-require("dotenv").config();
+import { SlashCommandBuilder } from "discord.js";
 
-const { SlashCommandBuilder } = require("discord.js");
-module.exports = {
+export default {
   data: new SlashCommandBuilder()
     .setName("allguilds")
     .setDescription("All guilds")

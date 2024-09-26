@@ -1,15 +1,9 @@
-const fs = require("fs");
+import fs from "fs";
 
-module.exports = async (client) => {
-  const eventFiles = fs
-    .readdirSync("./events")
-    .filter((file) => file.endsWith(".js"));
-  for (const file of eventFiles) {
-    const event = require(`../events/${file}`);
-    if (event.once) {
-      client.once(event.name, (...args) => event.execute(...args, client));
-    } else {
-      client.on(event.name, (...args) => event.execute(...args, client));
-    }
-  }
+export default async (client) => {
+  fs.readdirSync(`${process.cwd()}/events`).forEach(async (handler) => {
+    await import(`${process.cwd()}/events/${handler}`).then((module) => {
+      module.default(client);
+    });
+  });
 };
