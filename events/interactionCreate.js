@@ -6,7 +6,7 @@ export default (client) => {
       const command = client.commands.get(interaction.commandName);
       if (!command) return;
       if (command.ownerOnly) {
-        if (interaction.user.id !== process.env.ownerID) {
+        if (!client.owners.includes(interaction.user.id)) {
           return interaction.reply({
             content: "You are not allowed to use this command",
             ephemeral: true,
