@@ -16,9 +16,10 @@ export default {
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
     const { image, title } = await getRandomCat();
+    await interaction.deferReply();
 
     function getRandomCat() {
-      return new Promise(async (resolve, reject) => {
+      return new Promise(async (resolve) => {
         let image;
         let title;
         do {
@@ -51,7 +52,7 @@ export default {
 
     const row = new ActionRowBuilder().addComponents(nextButton);
 
-    let message = await interaction.reply({
+    let message = await interaction.editReply({
       embeds: [embed],
       components: [row],
     });

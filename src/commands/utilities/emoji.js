@@ -48,6 +48,7 @@ export default {
   ownerOnly: true,
   run: async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand();
+    await interaction.deferReply();
     switch (subcommand) {
       case "list": {
         const emojis = await client.application.emojis.fetch();
@@ -65,13 +66,16 @@ export default {
           .setTitle("Emoji list")
           .setFields(list)
           .setColor("Random");
-        return await interaction.reply({ embeds: [embed], ephemeral: true });
+        return await interaction.editReply({
+          embeds: [embed],
+          ephemeral: true,
+        });
       }
       case "add": {
         const name = interaction.options.getString("name");
         const image = interaction.options.getAttachment("image");
         if (!image.contentType.startsWith("image")) {
-          return await interaction.reply({
+          return await interaction.editReply({
             content: "The file must be an image",
             ephemeral: true,
           });
@@ -83,7 +87,7 @@ export default {
             name: name,
           })
           .catch(console.error);
-        return await interaction.reply(
+        return await interaction.editReply(
           `Emoji ${emoji.toString()} has been created`
         );
       }
@@ -93,7 +97,7 @@ export default {
           .fetch(id)
           .catch(console.error);
         emoji.delete();
-        return await interaction.reply(
+        return await interaction.editReply(
           `Emoji ${emoji.toString()} has been deleted`
         );
       }
@@ -104,7 +108,7 @@ export default {
           .fetch(id)
           .catch(console.error);
         emoji.edit({ name: name });
-        return await interaction.reply(
+        return await interaction.editReply(
           `Emoji ${emoji.toString()} has been edited`
         );
       }

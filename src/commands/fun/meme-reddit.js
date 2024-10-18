@@ -11,6 +11,7 @@ export default {
     const response = await axios.get(
       "https://api.reddit.com/r/memes/random/.json"
     );
+    await interaction.deferReply();
     const responseData = response.data[0].data.children[0].data;
 
     const memeimage = responseData.url_overridden_by_dest;
@@ -20,6 +21,6 @@ export default {
       .setImage(memeimage)
       .setFooter({ text: `From r/memes` })
       .setColor("Random");
-    await interaction.reply({ embeds: [memeEmbed] });
+    await interaction.editReply({ embeds: [memeEmbed] });
   },
 };

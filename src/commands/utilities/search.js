@@ -14,6 +14,7 @@ export default {
         .setRequired(true)
     ),
   run: async (interaction) => {
+    await interaction.deferReply();
     const query = interaction.options.getString("query");
     const results = (await DDG.search(query, { locale: "pl_PL", region: "pl" }))
       .results;
@@ -30,7 +31,7 @@ export default {
       })
       .setColor("Random");
 
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [embed],
     });
   },
