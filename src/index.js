@@ -14,8 +14,8 @@ const client = new Client({
 
 client.commands = new Collection();
 
-fs.readdirSync("./functions").forEach(async (handler) => {
-  await import(`./functions/${handler}`).then((module) => {
+fs.readdirSync(`${process.cwd()}/src/functions`).forEach(async (handler) => {
+  await import(`${process.cwd()}/src/functions/${handler}`).then((module) => {
     module.default(client);
   });
 });

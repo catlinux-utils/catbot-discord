@@ -2,10 +2,10 @@
   "name": "discord-catbot",
   "version": "1.5.0",
   "description": "Discord bot in nodejs and discord.js",
-  "exports": "./index.js",
+  "exports": "./src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "start": "node ./src/index.js"
   },
   "keywords": [],
   "author": "",
