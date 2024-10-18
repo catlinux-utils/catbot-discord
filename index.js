@@ -19,4 +19,5 @@ fs.readdirSync("./functions").forEach(async (handler) => {
     module.default(client);
   });
 });
+
 client.login(process.env.token);
