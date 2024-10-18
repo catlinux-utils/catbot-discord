@@ -18,13 +18,21 @@ export default {
     const query = interaction.options.getString("query");
     const results = (await DDG.search(query, { locale: "pl_PL", region: "pl" }))
       .results;
+    let list = [];
+    results.slice(0, 4).forEach((result, index) => {
+      const data = {
+        name: `${index + 1}. ${result.title} \n${result.url}`,
+        value: result.description
+          .replace(/<b>/g, "**")
+          .replace(/<\/b>/g, "**")
+          .normalize("NFC")
+          .substring(0, 250),
+      };
+      list.push(data);
+    });
     const embed = new EmbedBuilder()
-      .setTitle(results[0].title)
-      .setDescription(
-        results[0].description.replace(/<b>/g, "**").replace(/<\/b>/g, "**")
-      )
-      .setURL(results[0].url)
-      .setThumbnail(results[0].icon)
+      .setTitle(`Search: ${query}`)
+      .setFields(list)
       .setFooter({
         text: "Powered by DuckDuckGo",
         icon: "https://duckduckgo.com/assets/icons/meta/DDG-icon_256x256.png",
