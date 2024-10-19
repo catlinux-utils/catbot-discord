@@ -8,10 +8,11 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
+    await interaction.deferReply();
     const response = await axios.get(
       "https://api.reddit.com/r/memes/random/.json"
     );
-    await interaction.deferReply();
+    
     const responseData = response.data[0].data.children[0].data;
 
     const memeimage = responseData.url_overridden_by_dest;

@@ -7,6 +7,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
+    await interaction.deferReply();
     let list = [];
     for (const command of interaction.client.application.commands.cache) {
       let data = new Object();
@@ -21,6 +22,6 @@ export default {
       .setTitle("Help")
       .setFields(list)
       .setColor("Random");
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.editReply({ embeds: [embed], ephemeral: true });
   },
 };

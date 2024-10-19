@@ -8,10 +8,11 @@ export default {
     .setContexts([0, 1, 2]),
   ownerOnly: true,
   run: async (interaction) => {
+    await interaction.deferReply();
     let userlist = "Users:\n";
     interaction.client.users.cache.forEach((user) => {
       userlist += ` - ${user.username} (${user.id})\n`;
     });
-    await interaction.reply({ content: userlist, ephemeral: true });
+    await interaction.editReply({ content: userlist, ephemeral: true });
   },
 };

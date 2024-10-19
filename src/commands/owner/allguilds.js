@@ -8,11 +8,12 @@ export default {
     .setContexts([0, 1, 2]),
   ownerOnly: true,
   run: async (interaction, client) => {
+    await interaction.deferReply();
     let list = "Guilds:\n";
     client.guilds.cache.forEach((guild) => {
       list += ` - ${guild.name} (${guild.id}) - ${guild.memberCount} Members - Owner: ${guild.ownerId}\n`;
     });
 
-    await interaction.reply({ content: list, ephemeral: true });
+    await interaction.editReply({ content: list, ephemeral: true });
   },
 };

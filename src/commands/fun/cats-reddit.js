@@ -15,8 +15,8 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
-    const { image, title } = await getRandomCat();
     await interaction.deferReply();
+    const { image, title } = await getRandomCat();
 
     function getRandomCat() {
       return new Promise(async (resolve) => {
@@ -26,14 +26,13 @@ export default {
           const response = await axios.get(
             "https://api.reddit.com/r/cats/random/.json"
           );
+
           const responseData = response.data[0].data.children[0].data;
 
           image = responseData.url_overridden_by_dest;
           title = responseData.title;
         } while (
-          !image ||
-          image.startsWith("https://v.redd.it/") ||
-          image.includes("/gallery/")
+          !image || !image.includes(".jpg") || !image.includes(".jpeg")
         );
 
         resolve({ image, title });
