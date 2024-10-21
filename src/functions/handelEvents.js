@@ -1,9 +1,11 @@
 import fs from "fs";
 
 export default async (client) => {
-  fs.readdirSync(`${process.cwd()}/src/events`).forEach(async (handler) => {
-    await import(`${process.cwd()}/src/events/${handler}`).then((module) => {
-      module.default(client);
-    });
-  });
+  const { log } = client.utils.logging;
+  const events = fs.readdirSync(`${process.cwd()}/src/events`);
+  for (const event of events) {
+    const eventHandler = await import(`${process.cwd()}/src/events/${event}`);
+    eventHandler.default(client);
+  }
+  log(`Loaded ${events.length} events`);
 };

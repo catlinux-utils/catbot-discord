@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 export default (client) => {
+  const { error } = client.utils.logging;
   client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
       const command = client.commands.get(interaction.commandName);
@@ -17,7 +18,7 @@ export default (client) => {
       try {
         await command.run(interaction, client);
       } catch (error) {
-        console.log(error);
+        error(error);
         await interaction.reply({
           content: "There was an error while executing this command!",
           ephemeral: true,
@@ -38,7 +39,7 @@ export default (client) => {
       try {
         await command.run(interaction, client);
       } catch (error) {
-        console.log(error);
+        error(error);
         await interaction.editReply({
           content: "There was an error while executing this command!",
           ephemeral: true,

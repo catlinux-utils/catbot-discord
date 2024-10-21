@@ -2,6 +2,7 @@ import fs from "fs";
 import { SlashCommandBuilder } from "discord.js";
 
 export default async (client) => {
+  const { log } = client.utils.logging;
   client.commandArray = [];
   const commandFolders = fs.readdirSync(`${process.cwd()}/src/commands`);
   for (const folder of commandFolders) {
@@ -20,6 +21,7 @@ export default async (client) => {
       }
     }
   }
+  log(`Loaded ${client.commandArray.length} commands`);
 
   client.on("ready", async () => {
     await client.application.commands

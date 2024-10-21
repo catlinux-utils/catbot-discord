@@ -1,6 +1,7 @@
 export default (client) => {
+  const { log } = client.utils.logging;
   client.on("ready", async () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    log(`Logged in as ${client.user.tag}!`);
     await client.application.fetch();
     const owners = client.application.owner.members
       ? client.application.owner.members
