@@ -1,20 +1,26 @@
 import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
+import PetPetUtils from "../../utils/PetPetUtils.js";
 
 export default {
   data: new ContextMenuCommandBuilder()
-    .setName("petpet")
-    .setDescription("pet user")
+    .setName("PetPet")
     .setIntegrationTypes([0, 1])
-    .setContexts([0, 1, 2])
+    .setContexts([0])
     .setType(ApplicationCommandType.User),
-  ownerOnly: true,
-  run: async (interaction, client) => {
+  run: async (interaction) => {
     await interaction.deferReply();
-    let list = "Guilds:\n";
-    client.guilds.cache.forEach((guild) => {
-      list += ` - ${guild.name} (${guild.id}) - ${guild.memberCount} Members - Owner: ${guild.ownerId}\n`;
-    });
+    const user = interaction.targetUser;
+    const avatar = user.avatarURL("gif", 2048);
 
-    await interaction.editReply({ content: list, ephemeral: true });
+    const gif = await PetPetUtils.createGif(avatar, "20");
+
+    await interaction.editReply({
+      files: [
+        {
+          name: "petpet.gif",
+          contents: gif,
+        },
+      ],
+    });
   },
 };
