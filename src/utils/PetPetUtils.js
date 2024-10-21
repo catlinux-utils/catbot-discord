@@ -1,3 +1,5 @@
+//source: https://github.com/tairasoul/petpet-bot/blob/main/src/utils.ts - MIT Licence
+
 import { createCanvas, loadImage } from "canvas";
 
 import pkg from "gifenc";
@@ -25,7 +27,6 @@ const getFrames = (() => {
 export default class PetPetUtils {
   static async createGif(profileImage, delay = 20) {
     const frames = await getFrames();
-
     const gif = new GIFEncoder(128, 128);
 
     const canv = createCanvas(128, 128);
