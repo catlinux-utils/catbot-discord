@@ -1,7 +1,7 @@
 import "dotenv/config";
+import { error } from "../utils/logging.js";
 
 export default (client) => {
-  const { error } = client.utils.logging;
   client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
       const command = client.commands.get(interaction.commandName);

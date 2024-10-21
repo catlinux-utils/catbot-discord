@@ -1,5 +1,5 @@
+import { log } from "../utils/logging.js";
 export default (client) => {
-  const { log } = client.utils.logging;
   client.on("ready", async () => {
     log(`Logged in as ${client.user.tag}!`);
     await client.application.fetch();

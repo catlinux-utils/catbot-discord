@@ -1,4 +1,5 @@
 import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
+import { createGif } from "../../utils/PetPetUtils.js";
 
 export default {
   data: new ContextMenuCommandBuilder()
@@ -9,9 +10,9 @@ export default {
   run: async (interaction, client) => {
     await interaction.deferReply();
     const user = interaction.targetUser;
-    const avatar = await user.avatarURL({ extension: "png" });
+    const avatar = await user.avatarURL({ extension: "png", size: 1024 });
 
-    const gif = await client.utils.PetPetUtils.createGif(avatar, "20");
+    const gif = await createGif(avatar, "20");
 
     await interaction.editReply({
       files: [

@@ -1,12 +1,11 @@
-import chalt from "chalk";
-export default {
-  log: (message) => {
-    console.log(chalt.green(`[SUCCESS] ${message}`));
-  },
-  error: (message) => {
-    console.log(chalt.red(`[ERROR] ${message}`));
-  },
-  warn: (message) => {
-    console.log(chalt.yellow(`[WARN] ${message}`));
-  },
+import chalk from "chalk";
+export const log = (message) => {
+  console.log(chalk.green(`[SUCCESS] ${message}`));
 };
+export const error = (message) => {
+  console.log(chalk.red(`[ERROR] ${message}`));
+};
+export const warn = (message) => {
+  console.log(chalk.yellow(`[WARN] ${message}`));
+};
+export default { log, error, warn };
