@@ -18,25 +18,21 @@ export default {
     await interaction.deferReply();
     const { image, title } = await getRandomCat();
 
-    function getRandomCat() {
-      return new Promise(async (resolve) => {
-        let image;
-        let title;
-        do {
-          const response = await axios.get(
-            "https://api.reddit.com/r/cats/random/.json"
-          );
-
-          const responseData = response.data[0].data.children[0].data;
-
-          image = responseData.url_overridden_by_dest;
-          title = responseData.title;
-        } while (
-          !image || !image.includes(".jpg") || !image.includes(".jpeg")
+    async function getRandomCat() {
+      let image;
+      let title;
+      do {
+        const response = await axios.get(
+          "https://api.reddit.com/r/cats/random/.json"
         );
 
-        resolve({ image, title });
-      });
+        const responseData = response.data[0].data.children[0].data;
+
+        image = responseData.url_overridden_by_dest;
+        title = responseData.title;
+      } while (!image || !image.includes(".jpg") || !image.includes(".jpeg"));
+
+      return { image, title };
     }
     const embed = new EmbedBuilder()
       .setTitle(`${title}`)
