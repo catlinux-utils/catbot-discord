@@ -70,7 +70,9 @@ export default {
     const row = new ActionRowBuilder().addComponents(nextButton);
     if (image === "noimage") {
       row.components.forEach((button) => button.setDisabled(true));
-      await interaction.editReply({ components: [row] });
+      await interaction.editReply({ components: [row] }).catch((error) => {
+        console.log(error);
+      });
       return;
     }
 
@@ -99,15 +101,21 @@ export default {
           .setImage(image)
           .setFooter({ text: `${tries} From r/cats` })
           .setColor("Random");
-        response.editReply({
-          embeds: [embed],
-        });
+        response
+          .editReply({
+            embeds: [embed],
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     });
     collector.on("end", async () => {
       row.components.forEach((button) => button.setDisabled(true));
 
-      await interaction.editReply({ components: [row] });
+      await interaction.editReply({ components: [row] }).catch((error) => {
+        console.log(error);
+      });
     });
   },
 };

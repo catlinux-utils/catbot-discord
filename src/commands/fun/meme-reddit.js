@@ -64,7 +64,9 @@ export default {
     const row = new ActionRowBuilder().addComponents(nextButton);
     if (image === "noimage") {
       row.components.forEach((button) => button.setDisabled(true));
-      await interaction.editReply({ components: [row] });
+      await interaction.editReply({ components: [row] }).catch((error) => {
+        console.log(error);
+      });
       return;
     }
 
@@ -91,17 +93,23 @@ export default {
         const embed = new EmbedBuilder()
           .setTitle(`${title}`)
           .setImage(image)
-          .setFooter({ text: ` From r/memes ${tries}` })
+          .setFooter({ text: `${tries} From r/memes` })
           .setColor("Random");
-        response.editReply({
-          embeds: [embed],
-        });
+        response
+          .editReply({
+            embeds: [embed],
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     });
     collector.on("end", async () => {
       row.components.forEach((button) => button.setDisabled(true));
 
-      await interaction.editReply({ components: [row] });
+      await interaction.editReply({ components: [row] }).catch((error) => {
+        console.log(error);
+      });
     });
   },
 };
