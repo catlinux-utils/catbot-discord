@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { error } from "../utils/logging.js";
+import log from "../utils/logging.js";
 
 export default (client) => {
   client.on("interactionCreate", async (interaction) => {
@@ -18,7 +18,7 @@ export default (client) => {
       try {
         await command.run(interaction, client);
       } catch (error) {
-        error(error);
+        console.log(error);
         await interaction.reply({
           content: "There was an error while executing this command!",
           ephemeral: true,
@@ -39,7 +39,7 @@ export default (client) => {
       try {
         await command.run(interaction, client);
       } catch (error) {
-        error(error);
+        console.log(error);
         await interaction.editReply({
           content: "There was an error while executing this command!",
           ephemeral: true,
