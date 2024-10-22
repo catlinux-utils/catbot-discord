@@ -13,12 +13,14 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
+    "canvafy": "^7.2.0",
     "canvas": "^2.11.2",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "duck-duck-scrape": "^2.2.5",
     "gifenc": "^1.0.3",
-    "lowdb": "^7.0.1"
+    "lowdb": "^7.0.1",
+    "youtubei": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
