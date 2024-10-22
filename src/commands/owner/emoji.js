@@ -49,7 +49,7 @@ export default {
   run: async (interaction, client) => {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
-    
+
     switch (subcommand) {
       case "list": {
         const emojis = await client.application.emojis.fetch();

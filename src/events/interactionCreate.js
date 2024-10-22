@@ -1,5 +1,4 @@
 import "dotenv/config";
-import log from "../utils/logging.js";
 
 export default (client) => {
   client.on("interactionCreate", async (interaction) => {
@@ -37,7 +36,9 @@ export default (client) => {
         }
       }
       try {
-        await command.run(interaction, client);
+        await command.run(interaction, client).catch((error) => {
+          console.log(error);
+        });
       } catch (error) {
         console.log(error);
         await interaction.editReply({

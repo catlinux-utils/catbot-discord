@@ -93,7 +93,7 @@ export default {
         const embed = new EmbedBuilder()
           .setTitle(`${title}`)
           .setImage(image)
-          .setFooter({ text: `${tries} From r/memes` })
+          .setFooter({ text: ` From r/memes ${tries}` })
           .setColor("Random");
         response
           .editReply({

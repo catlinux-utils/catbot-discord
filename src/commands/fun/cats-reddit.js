@@ -59,7 +59,7 @@ export default {
     const embed = new EmbedBuilder()
       .setTitle(`${title}`)
       .setImage(image)
-      .setFooter({ text: `${tries} From r/cats` })
+      .setFooter({ text: ` From r/cats ${tries}` })
       .setColor("Random");
 
     const nextButton = new ButtonBuilder()
@@ -86,6 +86,13 @@ export default {
       time: 300_000,
       filter: (i) => i.user.id === interaction.user.id,
     });
+    collector.on("end", async () => {
+      row.components.forEach((button) => button.setDisabled(true));
+
+      await interaction.editReply({ components: [row] }).catch((error) => {
+        console.log(error);
+      });
+    });
 
     collector.on("collect", async (response) => {
       if (response.customId === "next") {
@@ -93,13 +100,15 @@ export default {
         const { image, title, tries } = await getRandomCat();
         if (image === "noimage") {
           row.components.forEach((button) => button.setDisabled(true));
-          await interaction.editReply({ components: [row] });
+          await interaction.editReply({ components: [row] }).catch((error) => {
+            console.log(error);
+          });
           return;
         }
         const embed = new EmbedBuilder()
           .setTitle(`${title}`)
           .setImage(image)
-          .setFooter({ text: `${tries} From r/cats` })
+          .setFooter({ text: ` From r/cats ${tries}` })
           .setColor("Random");
         response
           .editReply({
@@ -109,13 +118,6 @@ export default {
             console.log(error);
           });
       }
-    });
-    collector.on("end", async () => {
-      row.components.forEach((button) => button.setDisabled(true));
-
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
     });
   },
 };
