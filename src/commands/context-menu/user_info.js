@@ -15,6 +15,7 @@ export default {
   run: async (interaction) => {
     await interaction.deferReply();
     const user = interaction.targetUser;
+    const member = interaction.options.get("user");
 
     const info = new EmbedBuilder()
       .setTitle(`${user.username}'s Info`)
@@ -34,8 +35,13 @@ export default {
         {
           name: "**Created On:**",
           value: `${time(user.createdAt, TimestampStyles.LongDate)}`,
-          inline: false,
-        }
+          inline: true,
+        },
+        {
+          name: "**Joined Server On:**",
+          value: `${time(new Date(member.member.joined_at), TimestampStyles.LongDate)}`,
+          inline: true,
+        },
       )
       .setTimestamp();
 
