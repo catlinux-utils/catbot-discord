@@ -10,13 +10,12 @@ export default async (client) => {
     const commandFiles = fs
       .readdirSync(`${process.cwd()}/src/commands/${folder}`)
       .filter((file) => file.endsWith(".js"));
-      client.categoriesArray.push(folder)
+    client.categoriesArray.push(folder);
     for (const file of commandFiles) {
       const command = await import(
         `${process.cwd()}/src/commands/${folder}/${file}`
       );
-      command.default.category = folder
-      
+      command.default.category = folder;
       client.commands.set(command.default.data.name, command.default);
       if (command.default.data instanceof SlashCommandBuilder) {
         client.commandArray.push(command.default.data.toJSON());
