@@ -70,9 +70,7 @@ export default {
     const row = new ActionRowBuilder().addComponents(nextButton);
     if (image === "noimage") {
       row.components.forEach((button) => button.setDisabled(true));
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      await interaction.editReply({ components: [row] });
       return;
     }
 
@@ -83,15 +81,13 @@ export default {
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      time: 300_000,
+      time: 30_000,
       filter: (i) => i.user.id === interaction.user.id,
     });
     collector.on("end", async () => {
       row.components.forEach((button) => button.setDisabled(true));
-
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      if (!(await interaction.fetchReply().catch(() => false))) return;
+      await interaction.editReply({ components: [row] });
     });
 
     collector.on("collect", async (response) => {
@@ -100,9 +96,7 @@ export default {
         const { image, title, tries } = await getRandomCat();
         if (image === "noimage") {
           row.components.forEach((button) => button.setDisabled(true));
-          await interaction.editReply({ components: [row] }).catch((error) => {
-            console.log(error);
-          });
+          await interaction.editReply({ components: [row] });
           return;
         }
         const embed = new EmbedBuilder()
@@ -110,13 +104,9 @@ export default {
           .setImage(image)
           .setFooter({ text: ` From r/cats ${tries}` })
           .setColor("Random");
-        response
-          .editReply({
-            embeds: [embed],
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        response.editReply({
+          embeds: [embed],
+        });
       }
     });
   },

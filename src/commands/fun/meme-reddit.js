@@ -64,9 +64,7 @@ export default {
     const row = new ActionRowBuilder().addComponents(nextButton);
     if (image === "noimage") {
       row.components.forEach((button) => button.setDisabled(true));
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      await interaction.editReply({ components: [row] });
       return;
     }
 
@@ -95,21 +93,15 @@ export default {
           .setImage(image)
           .setFooter({ text: ` From r/memes ${tries}` })
           .setColor("Random");
-        response
-          .editReply({
-            embeds: [embed],
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        response.editReply({
+          embeds: [embed],
+        });
       }
     });
     collector.on("end", async () => {
       row.components.forEach((button) => button.setDisabled(true));
-
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      if (!(await interaction.fetchReply().catch(() => false))) return;
+      await interaction.editReply({ components: [row] });
     });
   },
 };

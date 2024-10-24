@@ -126,10 +126,8 @@ export default {
     });
     collector.on("end", async () => {
       row.components.forEach((comp) => comp.setDisabled(true));
-
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      if (!(await interaction.fetchReply().catch(() => false))) return;
+      await interaction.editReply({ components: [row] });
     });
 
     collector.on("collect", async (response) => {
@@ -140,13 +138,9 @@ export default {
         .setTitle("Help")
         .setFields(fieds)
         .setColor("Random");
-      response
-        .editReply({
-          embeds: [comembed],
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      response.editReply({
+        embeds: [comembed],
+      });
     });
   },
 };

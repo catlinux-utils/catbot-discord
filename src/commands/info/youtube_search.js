@@ -63,10 +63,8 @@ export default {
     });
     collector.on("end", async () => {
       row.components.forEach((button) => button.setDisabled(true));
-
-      await interaction.editReply({ components: [row] }).catch((error) => {
-        console.log(error);
-      });
+      if (!(await interaction.fetchReply().catch(() => false))) return;
+      await interaction.editReply({ components: [row] });
     });
     collector.on("collect", async (response) => {
       if (response.customId === "next") {
@@ -76,18 +74,14 @@ export default {
         if (length === videos.items.length) {
           nextButton.setDisabled(true);
         }
-        response
-          .editReply({
-            content: `${emoji.toString()} [${length}/${
-              videos.items.length
-            }] Search: ${query}\n https://www.youtube.com/watch?v=${
-              videos.items[length - 1].id
-            }`,
-            components: [row],
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        response.editReply({
+          content: `${emoji.toString()} [${length}/${
+            videos.items.length
+          }] Search: ${query}\n https://www.youtube.com/watch?v=${
+            videos.items[length - 1].id
+          }`,
+          components: [row],
+        });
       } else if (response.customId === "prev") {
         await response.deferUpdate();
         length--;
@@ -95,18 +89,14 @@ export default {
         if (length === 1) {
           prevButton.setDisabled(true);
         }
-        response
-          .editReply({
-            content: `${emoji.toString()} [${length}/${
-              videos.items.length
-            }] Search: ${query}\nhttps://www.youtube.com/watch?v=${
-              videos.items[0].id
-            }`,
-            components: [row],
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+        response.editReply({
+          content: `${emoji.toString()} [${length}/${
+            videos.items.length
+          }] Search: ${query}\nhttps://www.youtube.com/watch?v=${
+            videos.items[0].id
+          }`,
+          components: [row],
+        });
       }
     });
   },
