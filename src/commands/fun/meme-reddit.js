@@ -16,9 +16,9 @@ export default {
     .setContexts([0, 1, 2]),
   run: async (interaction) => {
     await interaction.deferReply();
-    const { image, title, tries } = await getRandomCat();
+    const { image, title, tries } = await getRandomMeme();
 
-    async function getRandomCat() {
+    async function getRandomMeme() {
       let image;
       let title;
       let tries = 0;
@@ -82,7 +82,7 @@ export default {
     collector.on("collect", async (response) => {
       if (response.customId === "next") {
         await response.deferUpdate();
-        const { image, title, tries } = await getRandomCat();
+        const { image, title, tries } = await getRandomMeme();
         if (image === "noimage") {
           row.components.forEach((button) => button.setDisabled(true));
           await interaction.editReply({ components: [row] });
