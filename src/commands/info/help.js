@@ -14,39 +14,6 @@ export default {
     .setContexts([0, 1, 2]),
   run: async (interaction, client) => {
     await interaction.deferReply();
-    let commandList = [];
-    for (const command of client.application.commands.cache) {
-      if (command[1].type !== 1) continue;
-
-      if (command[1].options[0]) {
-        const allTier1 = command[1].options.every(
-          (element) => element.type === 1
-        );
-
-        command[1].options.forEach((element) => {
-          if (element.type !== 1) return;
-
-          let data = {
-            name: `</${command[1].name} ${element.name}:${command[1].id}>`,
-            value: element.description || "---",
-            inline: true,
-          };
-          commandList.push(data);
-        });
-
-        if (allTier1) {
-          continue;
-        }
-      }
-
-      let data = new Object();
-      data = {
-        name: `</${command[1].name}:${command[1].id}>`,
-        value: command[1].description || "---",
-        inline: true,
-      };
-      commandList.push(data);
-    }
 
     function catCom(category) {
       let list = [];
@@ -104,14 +71,23 @@ export default {
         value: cat,
       });
     });
+    let catfield = [];
+    client.categoriesArray.forEach((cat) => {
+      if (cat == "context-menu") return;
+      return catfield.push({
+        name: cat,
+        value: `${cat} commands!`,
+        inline: true,
+      });
+    });
     const catSelect = new StringSelectMenuBuilder()
       .setCustomId("starter")
       .setPlaceholder("Make a selection!")
       .setOptions(catmenu);
     const row = new ActionRowBuilder().addComponents(catSelect);
     const catembed = new EmbedBuilder()
-      .setTitle("Help")
-      .setFields(commandList)
+      .setTitle("Help - Categories:")
+      .setFields(catfield)
       .setColor("Random");
 
     const message = await interaction.editReply({
@@ -135,7 +111,12 @@ export default {
       const fieds = catCom(response.values[0]);
 
       const comembed = new EmbedBuilder()
-        .setTitle("Help")
+        .setTitle(
+          `Help - ${
+            response.values[0].charAt(0).toUpperCase() +
+            response.values[0].slice(1)
+          } category`
+        )
         .setFields(fieds)
         .setColor("Random");
       response.editReply({

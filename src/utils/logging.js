@@ -12,7 +12,7 @@ const createLogger =
   ({ color, prefix }) =>
   (message) => {
     const date = new Date().toLocaleTimeString("en-US", { hour12: false });
-    console.log(`${date} ${chalk[color](`${prefix} ${message}`)}`);
+    console.log(`${date} ${chalk[color](`${prefix} `)}${message}`);
   };
 
 export default Object.fromEntries(
