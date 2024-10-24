@@ -1,5 +1,4 @@
 import fs from "fs";
-import { log } from "../utils/logging.js";
 
 export default async (client) => {
   const events = fs.readdirSync(`${process.cwd()}/src/events`);
@@ -7,5 +6,5 @@ export default async (client) => {
     const eventHandler = await import(`${process.cwd()}/src/events/${event}`);
     eventHandler.default(client);
   }
-  log(`Loaded ${events.length} events`);
+  client.logs.info(`Loaded ${events.length} events`);
 };

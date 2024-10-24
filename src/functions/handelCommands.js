@@ -1,6 +1,5 @@
 import fs from "fs";
 import { SlashCommandBuilder } from "discord.js";
-import { log } from "../utils/logging.js";
 
 export default async (client) => {
   client.commandArray = [];
@@ -24,7 +23,7 @@ export default async (client) => {
       }
     }
   }
-  log(`Loaded ${client.commandArray.length} commands`);
+  client.logs.info(`Loaded ${client.commandArray.length} commands`);
 
   client.on("ready", async () => {
     await client.application.commands

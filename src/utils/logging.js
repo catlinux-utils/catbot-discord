@@ -1,11 +1,20 @@
 import chalk from "chalk";
-export const log = (message) => {
-  console.log(chalk.green(`[SUCCESS] ${message}`));
+
+const loggerConfig = {
+  success: { color: "green", prefix: "[SUCCESS]" },
+  error: { color: "red", prefix: "[ERROR]" },
+  warn: { color: "yellow", prefix: "[WARN]" },
+  info: { color: "blue", prefix: "[INFO]" },
+  startup: { color: "cyanBright", prefix: "[STARTUP]" },
 };
-export const error = (message) => {
-  console.log(chalk.red(`[ERROR] ${message}`));
-};
-export const warn = (message) => {
-  console.log(chalk.yellow(`[WARN] ${message}`));
-};
-export default { log, error, warn };
+
+const createLogger =
+  ({ color, prefix }) =>
+  (message) => {
+    const date = new Date().toLocaleTimeString("en-US", { hour12: false });
+    console.log(`${date} ${chalk[color](`${prefix} ${message}`)}`);
+  };
+
+export default Object.fromEntries(
+  Object.entries(loggerConfig).map(([key, value]) => [key, createLogger(value)])
+);

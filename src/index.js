@@ -12,6 +12,8 @@ const client = new Client({
   ],
 });
 
+client.logs = (await import(`${process.cwd()}/src/utils/logging.js`)).default;
+
 client.commands = new Collection();
 client.utils = {};
 

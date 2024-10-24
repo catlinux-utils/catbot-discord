@@ -1,7 +1,6 @@
-import { log } from "../utils/logging.js";
 export default (client) => {
   client.on("ready", async () => {
-    log(`Logged in as ${client.user.tag}!`);
+    client.logs.startup(`Logged in as ${client.user.tag}!`);
     await client.application.fetch();
     const owners = client.application.owner.members
       ? client.application.owner.members
