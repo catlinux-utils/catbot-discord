@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import korwin from "../../json/korwin_funny.json" assert { type: "json" };
+import korwin from "../../json/korwin_funny.json" with { type: "json" };
 
 export default {
   data: new SlashCommandBuilder()
