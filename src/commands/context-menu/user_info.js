@@ -16,33 +16,41 @@ export default {
     await interaction.deferReply();
     const user = interaction.targetUser;
     const member = interaction.options.get("user");
+    let field = []
+    if (member.member?.nick) {
+      field.push({
+        name: "**Server Name:**",
+        value: `\`\`\`${member.member.nick}\`\`\``,
+        inline: false,
+      })
+    }
+    field.push(
+      {
+        name: "**Full Name:**",
+        value: `\`\`\`${user.globalName}\`\`\``,
+        inline: false,
+      },
+      {
+        name: "**Users ID:**",
+        value: `\`\`\`${user.id}\`\`\``,
+        inline: false,
+      },
+      {
+        name: "**Created On:**",
+        value: `${time(user.createdAt, TimestampStyles.LongDate)}`,
+        inline: true,
+      },
+      {
+        name: "**Joined Server On:**",
+        value: `${time(new Date(member.member.joined_at), TimestampStyles.LongDate)}`,
+        inline: true,
+      })
 
     const info = new EmbedBuilder()
       .setTitle(`${user.username}'s Info`)
       .setThumbnail(user.displayAvatarURL({ dynamic: true }))
       .setColor("Random")
-      .addFields(
-        {
-          name: "**Full Name:**",
-          value: `\`\`\`${user.globalName}\`\`\``,
-          inline: false,
-        },
-        {
-          name: "**Users ID:**",
-          value: `\`\`\`${user.id}\`\`\``,
-          inline: false,
-        },
-        {
-          name: "**Created On:**",
-          value: `${time(user.createdAt, TimestampStyles.LongDate)}`,
-          inline: true,
-        },
-        {
-          name: "**Joined Server On:**",
-          value: `${time(new Date(member.member.joined_at), TimestampStyles.LongDate)}`,
-          inline: true,
-        },
-      )
+      .addFields(field)
       .setTimestamp();
 
     await interaction.editReply({ embeds: [info] });
