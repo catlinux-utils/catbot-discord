@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, Collection } from "discord.js";
+import { createAudioPlayer, NoSubscriberBehavior } from "@discordjs/voice";
 import fs from "fs";
 
 import "dotenv/config";
@@ -13,6 +14,13 @@ const client = new Client({
 });
 
 client.logs = (await import(`${process.cwd()}/src/utils/logging.js`)).default;
+
+client.music;
+client.musicplayer = createAudioPlayer({
+  behaviors: {
+    noSubscriber: NoSubscriberBehavior.Pause,
+  },
+});
 
 client.commands = new Collection();
 client.utils = {};

@@ -1,4 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import os from "os";
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,6 +13,14 @@ export default {
         .setDescription("Show bot info")
         .addSubcommand((subcommand) =>
           subcommand.setName("uptime").setDescription("Show bot uptime")
+        )
+    )
+    .addSubcommandGroup((subcommandgroup) =>
+      subcommandgroup
+        .setName("system")
+        .setDescription("Show system info")
+        .addSubcommand((subcommand) =>
+          subcommand.setName("uptime").setDescription("Show system uptime")
         )
     ),
   ownerOnly: true,
@@ -32,7 +41,7 @@ export default {
             let seconds = Math.floor(totalSecs % 60);
             let uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
             const embed = new EmbedBuilder()
-              .setTitle("Uptime:")
+              .setTitle("Bot Uptime:")
               .setDescription(uptime)
               .setColor("Random")
               .setFooter({
@@ -42,6 +51,26 @@ export default {
             return await interaction.editReply({ embeds: [embed] });
           }
         }
+        break;
+      }
+      case "system": {
+        let totalSecs = os.uptime();
+        let days = Math.floor(totalSecs / 86400);
+        totalSecs %= 86400;
+        let hrs = Math.floor(totalSecs / 3600);
+        totalSecs %= 3600;
+        let mins = Math.floor(totalSecs / 60);
+        let seconds = Math.floor(totalSecs % 60);
+        let uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
+        const embed = new EmbedBuilder()
+          .setTitle("System Uptime:")
+          .setDescription(uptime)
+          .setColor("Random")
+          .setFooter({
+            text: client.application.bot.username,
+            iconURL: client.application.bot.displayAvatarURL(),
+          });
+        return await interaction.editReply({ embeds: [embed] });
       }
     }
   },
