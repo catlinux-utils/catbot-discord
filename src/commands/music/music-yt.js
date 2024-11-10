@@ -7,7 +7,8 @@ import {
   NoSubscriberBehavior,
 } from "@discordjs/voice";
 import { MusicClient } from "youtubei";
-import { extractStreamInfo } from "youtube-ext";
+import pkg from "@distube/ytdl-core";
+const { getInfo } = pkg;
 
 const musicClient = new MusicClient();
 
@@ -40,12 +41,12 @@ export default {
       });
 
     const query = interaction.options.getString("query");
-    const videos = await musicClient.search(query, {
-      type: "video",
-    });
-    const result = await extractStreamInfo(
-      `https://www.youtube.com/watch?v=${videos.items[0].id}`
+    const videos = await musicClient.search(query);
+    console.log(`https://www.youtube.com/watch?v=${videos[0].items[0].id}`);
+    const result = await getInfo(
+      `https://www.youtube.com/watch?v=${videos[0].items[0].id}`
     );
+    return console.log(result);
 
     const musicplayer = createAudioPlayer({
       behaviors: {
@@ -59,10 +60,9 @@ export default {
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
     connection.subscribe(musicplayer);
-    const resource = createAudioResource(
-      result.,
-      { inlineVolume: true }
-    );
+    const resource = createAudioResource(result.player?.url, {
+      inlineVolume: true,
+    });
     resource.volume.setVolume(0.3);
     await musicplayer.play(resource);
 
