@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 
 export default (client) => {
   client.on("messageCreate", async (message) => {
@@ -12,8 +12,19 @@ export default (client) => {
       });
     }
     const command = message.content.slice(6).trim();
-    exec(
-      `docker exec -u user -w /home/user arch_container /bin/bash -c "${command}"`,
+    execFile(
+      "docker",
+      [
+        "exec",
+        "-u",
+        "user",
+        "-w",
+        "/home/user",
+        "arch_container",
+        "/bin/bash",
+        "-c",
+        command,
+      ],
       (error, stdout, stderr) => {
         /*if (error) {
           client.logs.error(`Error: ${error.message}`);
@@ -28,3 +39,5 @@ export default (client) => {
     );
   });
 };
+
+//echo ls | docker exec -u user -w /home/user arch_container /bin/bash -c
