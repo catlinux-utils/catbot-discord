@@ -13,7 +13,7 @@ export default (client) => {
     }
     const command = message.content.slice(6).trim();
     exec(
-      `docker exec -u user -w /home/user arch_container ${command}`,
+      `docker exec -u user -w /home/user arch_container /bin/bash -c "${command}"`,
       (error, stdout, stderr) => {
         if (error) {
           message.reply(`Error: ${error.message}`);
