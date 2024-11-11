@@ -20,7 +20,7 @@ export default (client) => {
         }*/
         if (stderr) {
           return message.reply(
-            stdout ? `stderr:\n\`\`\`${stdout}\`\`\`` : "no output"
+            stdout ? `stderr:\n\`\`\`${stderr}\`\`\`` : "no output"
           );
         }
         return message.reply(stdout ? `\`\`\`${stdout}\`\`\`` : "no output");
