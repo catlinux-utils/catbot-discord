@@ -5,7 +5,7 @@ export default (client) => {
   client.on("messageCreate", async (message) => {
     if (message.author.bot || !message.content.startsWith("?exec ")) return;
 
-    if (!client.owners.includes(message.user.id)) {
+    if (!client.owners.includes(message.member.id)) {
       return message.reply({
         content: "You are not allowed to use this command",
         ephemeral: true,
