@@ -39,5 +39,3 @@ export default (client) => {
     );
   });
 };
-
-//echo ls | docker exec -u user -w /home/user arch_container /bin/bash -c
