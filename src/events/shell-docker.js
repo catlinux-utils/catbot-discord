@@ -15,11 +15,13 @@ export default (client) => {
     exec(
       `docker exec -u user -w /home/user arch_container /bin/bash -c "${command}"`,
       (error, stdout, stderr) => {
-        if (error) {
+        /*if (error) {
           client.logs.error(`Error: ${error.message}`);
-        }
+        }*/
         if (stderr) {
-          client.logs.error(`stderr: ${stderr}`);
+          message.reply(
+            stdout ? `stderr:\n\`\`\`${stdout}\`\`\`` : "no output"
+          );
         }
         message.reply(stdout ? `\`\`\`${stdout}\`\`\`` : "no output");
       }
