@@ -23,7 +23,7 @@ export default (client) => {
           message.reply(`stderr: ${stderr}`);
           return;
         }*/
-        message.reply(`\`\`\`${stdout}\`\`\``);
+        message.reply(stdout ? `\`\`\`${stdout}\`\`\`` : "no output");
       }
     );
   });
