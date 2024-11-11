@@ -19,11 +19,11 @@ export default (client) => {
           client.logs.error(`Error: ${error.message}`);
         }*/
         if (stderr) {
-          message.reply(
+          return message.reply(
             stdout ? `stderr:\n\`\`\`${stdout}\`\`\`` : "no output"
           );
         }
-        message.reply(stdout ? `\`\`\`${stdout}\`\`\`` : "no output");
+        return message.reply(stdout ? `\`\`\`${stdout}\`\`\`` : "no output");
       }
     );
   });
