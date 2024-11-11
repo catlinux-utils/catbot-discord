@@ -15,14 +15,14 @@ export default (client) => {
     exec(
       `docker exec -u user -w /home/user arch_container /bin/bash -c "${command}"`,
       (error, stdout, stderr) => {
-        if (error) {
+        /* if (error) {
           message.reply(`Error: ${error.message}`);
           return;
         }
         if (stderr) {
           message.reply(`stderr: ${stderr}`);
           return;
-        }
+        }*/
         message.reply(`\`\`\`${stdout}\`\`\``);
       }
     );
