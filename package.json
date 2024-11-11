@@ -22,7 +22,6 @@
     "dotenv": "^16.4.5",
     "duck-duck-scrape": "^2.2.5",
     "gifenc": "^1.0.3",
-    "isolated-vm": "^5.0.1",
     "lowdb": "^7.0.1",
     "opusscript": "^0.0.8",
     "sodium": "^3.0.2",
