@@ -1,97 +1,61 @@
-import { SlashCommandBuilder, Events, PermissionsBitField } from "discord.js";
-import {
-  createAudioResource,
-  joinVoiceChannel,
-  AudioPlayerStatus,
-  createAudioPlayer,
-  NoSubscriberBehavior,
-} from "@discordjs/voice";
-import { MusicClient } from "youtubei";
-import pkg from "@distube/ytdl-core";
-const { getInfo } = pkg;
-
-const musicClient = new MusicClient();
+import { SlashCommandBuilder, EmbedBuilder, channelMention } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("music-yt")
-    .setDescription("Play music from youtube")
-    .addStringOption((option) =>
-      option
-        .setName("query")
-        .setDescription("Query to search")
-        .setRequired(true)
+    .setName("music")
+    .setDescription("Music system")
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("play")
+        .setDescription("Play song")
+        .addStringOption((option) =>
+          option
+            .setName("query")
+            .setDescription("Provide name of the song")
+            .setRequired(true)
+        )
     ),
-  ownerOnly: true,
   run: async (interaction, client) => {
-    await interaction.deferReply();
-    if (!interaction.member.voice.channel)
-      return interaction.editReply({
-        content: "You need to enter channel",
-        ephemeral: true,
-      });
-    if (
-      !interaction.member.voice.channel
-        .permissionsFor(interaction.guild.members.me)
-        .has(PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak)
-    )
-      return interaction.editReply({
-        content: "I don't have permission to talk in this voice channel",
-        ephemeral: true,
-      });
-
+    const subcommand = interaction.options.getSubcommand();
     const query = interaction.options.getString("query");
-    const videos = await musicClient.search(query);
-    console.log(`https://www.youtube.com/watch?v=${videos[0].items[0].id}`);
-    const result = await getInfo(
-      `https://www.youtube.com/watch?v=${videos[0].items[0].id}`
-    );
-    return console.log(result);
+    const voiceChannel = interaction.member.voice.channel;
 
-    const musicplayer = createAudioPlayer({
-      behaviors: {
-        noSubscriber: NoSubscriberBehavior.Idle,
-      },
-    });
+    const embed = new EmbedBuilder();
 
-    const connection = await joinVoiceChannel({
-      channelId: interaction.member.voice.channel.id,
-      guildId: interaction.guild.id,
-      adapterCreator: interaction.guild.voiceAdapterCreator,
-    });
-    connection.subscribe(musicplayer);
-    const resource = createAudioResource(result.player?.url, {
-      inlineVolume: true,
-    });
-    resource.volume.setVolume(0.3);
-    await musicplayer.play(resource);
+    if (!voiceChannel) {
+      embed.setColor("Red").setDescription("You must be in a vc");
+      return interaction.reply({ embeds: [embed], ephemeral: true });
+    }
 
-    client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
-      const oldChannel = oldState.channel;
-      const newChannel = newState.channel;
+    if (
+      !interaction.member.voice.channel.id ==
+      interaction.guild.members.me.voice.channel?.id
+    ) {
+      embed
+        .setColor("Red")
+        .setDescription(
+          `You can't use the music system as its already active in ${channelMention(
+            interaction.guild.members.me.voice.channel.id
+          )}`
+        );
+      return interaction.reply({ embeds: [embed], ephemeral: true });
+    }
 
-      if (
-        oldChannel?.id &&
-        newChannel?.id &&
-        oldChannel?.id !== newChannel?.id
-      ) {
-        const chan = client.channels.cache.get(oldChannel.id);
-
-        if (chan && chan.members.size === 1) {
-          musicplayer.stop();
-        }
-      } else if (oldChannel && !newChannel) {
-        const channelMembers = oldChannel.members.size;
-        if (channelMembers === 1) {
-          musicplayer.stop();
-        }
+    try {
+      switch (subcommand) {
+        case "play":
+          client.distube.play(voiceChannel, query, {
+            textChannel: interaction.channel,
+            member: interaction.member,
+          });
+          return await interaction.reply({ content: "🎶 Request received." });
       }
-    });
+    } catch (err) {
+      console.log(err);
 
-    musicplayer.on(AudioPlayerStatus.Idle, () => {
-      connection.destroy();
-    });
+      embed.setColor("Red").setDescription("❌ | Something went wrong...");
 
-    await interaction.editReply("Playing radio");
+      return interaction.reply({ embeds: [embed], ephemeral: true });
+    }
   },
 };
