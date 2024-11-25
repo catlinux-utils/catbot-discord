@@ -28,7 +28,6 @@
     "lowdb": "^7.0.1",
     "opusscript": "^0.0.8",
     "sodium": "^3.0.2",
-    "youtube-ext": "^1.1.25",
     "youtubei": "^1.6.1"
   },
   "devDependencies": {

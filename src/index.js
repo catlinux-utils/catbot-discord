@@ -15,7 +15,6 @@ const client = new Client({
 client.logs = (await import(`${process.cwd()}/src/utils/logging.js`)).default;
 
 client.commands = new Collection();
-client.utils = {};
 
 fs.readdirSync(`${process.cwd()}/src/functions`).forEach(async (handler) => {
   await import(`${process.cwd()}/src/functions/${handler}`).then((module) => {
