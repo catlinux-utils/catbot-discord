@@ -25,6 +25,8 @@ export default {
             .setRequired(true)
         )
     ),
+  ownerOnly: true,
+
   run: async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand();
     const voiceChannel = interaction.member.voice.channel;
