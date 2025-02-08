@@ -1,19 +1,40 @@
-import { getYouTubeStreamUrl } from "../utils/music-url-scrape.js";
+import { getYouTubeStreamUrl } from "./music-url-scrape.js";
 import {
   createAudioResource,
   joinVoiceChannel,
   createAudioPlayer,
   NoSubscriberBehavior,
   AudioPlayerStatus,
+  VoiceConnection,
+  AudioPlayer,
+  AudioResource,
 } from "@discordjs/voice";
-import { EmbedBuilder } from "discord.js";
+import {
+  Client,
+  EmbedBuilder,
+  TextChannel,
+  VoiceChannel,
+  CommandInteraction,
+} from "discord.js";
 
 import { MusicClient } from "youtubei";
 const music = new MusicClient();
 
+interface Queue {
+  textChannel: TextChannel;
+  voiceChannel: VoiceChannel;
+  connection: VoiceConnection | null;
+  songs: string[];
+  volume: number;
+  playing: boolean;
+  player: AudioPlayer;
+  resource: AudioResource | null;
+}
+
 class MusicSystem {
-  constructor(client) {
-    this.client = client;
+  private queue: Map<string, Queue>;
+
+  constructor(client: Client) {
     this.queue = new Map();
 
     client.on("voiceStateUpdate", (oldState, newState) => {
@@ -28,22 +49,25 @@ class MusicSystem {
     });
   }
 
-  async play(voiceChannel, query, { textChannel }) {
+  async play(
+    voiceChannel: VoiceChannel,
+    query: string,
+    { textChannel }: { textChannel: TextChannel }
+  ) {
     const serverQueue = this.queue.get(voiceChannel.guild.id);
 
     if (!serverQueue) {
-      const queueConstruct = {
-        textChannel: textChannel,
-        voiceChannel: voiceChannel,
+      const queueConstruct: Queue = {
+        textChannel,
+        voiceChannel,
         connection: null,
-        songs: [],
+        songs: [query],
         volume: 5,
         playing: true,
         player: createAudioPlayer({
-          behaviors: {
-            noSubscriber: NoSubscriberBehavior.Stop,
-          },
+          behaviors: { noSubscriber: NoSubscriberBehavior.Stop },
         }),
+        resource: null,
       };
 
       this.queue.set(voiceChannel.guild.id, queueConstruct);
@@ -69,7 +93,7 @@ class MusicSystem {
     }
   }
 
-  async playSong(song, queueConstruct) {
+  async playSong(song: string, queueConstruct: Queue) {
     if (!song.startsWith("https://www.youtube.com/watch?v=")) {
       const results = await music.search(song);
       if (results[0].items.length === 0) return;
@@ -78,7 +102,11 @@ class MusicSystem {
     const streamUrl = await getYouTubeStreamUrl(song);
     if (!streamUrl) return;
     const resource = createAudioResource(streamUrl, { inlineVolume: true });
-    resource.volume.setVolume(0.3);
+    queueConstruct.resource = resource;
+
+    (queueConstruct.resource as any).volume.setVolume(
+      queueConstruct.volume / 10
+    );
     queueConstruct.player.play(resource);
 
     queueConstruct.player.once(AudioPlayerStatus.Idle, () => {
@@ -92,7 +120,9 @@ class MusicSystem {
       if (queueConstruct.songs.length > 0) {
         this.playSong(queueConstruct.songs[0], queueConstruct);
       } else {
-        queueConstruct.connection?.destroy();
+        if (queueConstruct.connection) {
+          queueConstruct.connection.destroy();
+        }
         this.queue.delete(queueConstruct.voiceChannel.guild.id);
       }
     });
@@ -105,13 +135,12 @@ class MusicSystem {
     queueConstruct.textChannel.send({ embeds: [songEmbed] });
   }
 
-  async stop(message) {
-    const serverQueue = this.queue.get(message.guild.id);
-    if (!serverQueue) return message.channel.send("No queue to stop!");
+  async stop(interaction: CommandInteraction) {
+    if (!interaction.guild) return;
+    const serverQueue = this.queue.get(interaction.guild.id);
+    if (!serverQueue) return interaction.reply("No queue to stop!");
     serverQueue.songs = [];
     serverQueue.player.stop();
-    serverQueue.connection.destroy();
-    this.queue.delete(message.guild.id);
   }
 
   async skip(message) {
@@ -131,6 +160,7 @@ class MusicSystem {
     if (!serverQueue) return message.channel.send("No queue to resume!");
     serverQueue.player.unpause();
   }
+  async volume(message, volume) {}
 }
 
 export default MusicSystem;

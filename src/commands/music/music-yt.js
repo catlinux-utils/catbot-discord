@@ -58,7 +58,7 @@ export default {
           });
         }
         case "stop": {
-          await client.musicsystem.stop(voiceChannel);
+          await client.musicsystem.stop(interaction);
           return await interaction.editReply({
             content: "🎶 Request received.",
           });

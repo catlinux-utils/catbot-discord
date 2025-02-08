@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits, Collection } from "discord.js";
 import fs from "fs";
-import MusicSystem from "./utils/music-system.js";
+import MusicSystem from "./utils/music-system.ts";
 
 import "dotenv/config";
 
@@ -12,14 +12,14 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates,
   ],
 });
-
-client.logs = (await import(`${process.cwd()}/src/utils/logging.js`)).default;
-client.musicsystem = new MusicSystem(client);
 client.config = (
   await import(`${process.cwd()}/config.json`, { with: { type: "json" } })
 ).default;
+client.logs = (await import(`${process.cwd()}/src/utils/logging.js`)).default;
 
-client.commands = new Collection();
+client.musicsystem = new MusicSystem(client);
+
+client.commands = new Collection<string, any>();
 
 fs.readdirSync(`${process.cwd()}/src/functions`).forEach(async (handler) => {
   await import(`${process.cwd()}/src/functions/${handler}`).then((module) => {

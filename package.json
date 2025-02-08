@@ -4,8 +4,9 @@
   "description": "Discord bot in nodejs and discord.js",
   "exports": "./src/index.js",
   "type": "module",
+  "types": "./src/index.d.ts",
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "node ./src/index.ts",
     "lint": "eslint ./src"
   },
   "keywords": [],
