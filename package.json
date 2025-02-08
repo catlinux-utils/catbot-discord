@@ -14,20 +14,21 @@
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
     "axios": "^1.7.9",
-    "canvas": "^3.0.1",
+    "canvas": "^3.1.0",
     "chalk": "^5.4.1",
-    "discord.js": "^14.17.2",
+    "discord.js": "^14.17.3",
     "dotenv": "^16.4.7",
-    "duck-duck-scrape": "^2.2.6",
+    "duck-duck-scrape": "^2.2.7",
     "gifenc": "^1.0.3",
     "lowdb": "^7.0.1",
+    "ollama": "^0.5.12",
     "opusscript": "^0.1.1",
     "sodium": "^3.0.2",
     "youtubei": "^1.6.7"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "eslint": "^9.17.0",
+    "@eslint/js": "^9.19.0",
+    "eslint": "^9.19.0",
     "globals": "^15.14.0"
   }
 }
