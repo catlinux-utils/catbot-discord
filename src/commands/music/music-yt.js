@@ -1,14 +1,4 @@
 import { SlashCommandBuilder, EmbedBuilder, channelMention } from "discord.js";
-import {
-  createAudioResource,
-  joinVoiceChannel,
-  createAudioPlayer,
-  NoSubscriberBehavior,
-  AudioPlayerStatus,
-} from "@discordjs/voice";
-import { getYouTubeStreamUrl } from "../../utils/music-url-scrape.js";
-import { MusicClient } from "youtubei";
-const music = new MusicClient();
 
 export default {
   data: new SlashCommandBuilder()
@@ -24,6 +14,9 @@ export default {
             .setDescription("Provide name of the song")
             .setRequired(true)
         )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("stop").setDescription("Stop song")
     ),
   ownerOnly: true,
 
@@ -46,7 +39,7 @@ export default {
       embed
         .setColor("Red")
         .setDescription(
-          `You can't use the music system as its already active in ${channelMention(
+          `You can't use the music system as it's already active in ${channelMention(
             interaction.guild.members.me.voice.channel.id
           )}`
         );
@@ -56,41 +49,16 @@ export default {
     try {
       switch (subcommand) {
         case "play": {
-          let query = interaction.options.getString("query");
-          if (!query.startsWith("https://www.youtube.com/watch?v=")) {
-            await music.search(query).then((res) => {
-              query = "https://www.youtube.com/watch?v=" + res[0].items[0].id;
-            });
-          }
-
-          const url = await getYouTubeStreamUrl(query);
-          let musicplayer = client.musicplayers.get(interaction.guildId);
-
-          if (!musicplayer) {
-            musicplayer = createAudioPlayer({
-              behaviors: {
-                noSubscriber: NoSubscriberBehavior.Idle,
-              },
-            });
-
-            const connection = await joinVoiceChannel({
-              channelId: interaction.member.voice.channel.id,
-              guildId: interaction.guild.id,
-              adapterCreator: interaction.guild.voiceAdapterCreator,
-            });
-            connection.subscribe(musicplayer);
-            client.musicplayers.set(interaction.guildId, musicplayer);
-          }
-
-          const resource = createAudioResource(url, { inlineVolume: true });
-          resource.volume.setVolume(0.3);
-          await musicplayer.play(resource);
-
-          musicplayer.on(AudioPlayerStatus.Idle, () => {
-            client.musicplayers.delete(interaction.guildId);
-            musicplayer?.playable[0]?.destroy();
-            musicplayer?.stop();
+          const query = interaction.options.getString("query");
+          await client.musicsystem.play(voiceChannel, query, {
+            textChannel: interaction.channel,
           });
+          return await interaction.editReply({
+            content: "🎶 Request received.",
+          });
+        }
+        case "stop": {
+          await client.musicsystem.stop(voiceChannel);
           return await interaction.editReply({
             content: "🎶 Request received.",
           });
@@ -98,9 +66,7 @@ export default {
       }
     } catch (err) {
       console.log(err);
-
-      embed.setColor("Red").setDescription("   | Something went wrong...");
-
+      embed.setColor("Red").setDescription("Something went wrong...");
       return interaction.editReply({ embeds: [embed], ephemeral: true });
     }
   },

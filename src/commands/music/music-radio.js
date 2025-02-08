@@ -10,11 +10,28 @@ import {
 export default {
   data: new SlashCommandBuilder()
     .setName("music-radio")
-    .setDescription("Play music radio"),
+    .setDescription("Play music radio")
+    .addStringOption((option) =>
+      option.setName("query").setDescription("Query to play").setRequired(false)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("skip-checks")
+        .setDescription("Skip checks")
+        .addChoices([
+          { name: "true", value: "true" },
+          { name: "false", value: "false" },
+        ])
+    ),
   ownerOnly: true,
   run: async (interaction, client) => {
     await interaction.deferReply();
-    if (!interaction.member.voice.channel)
+
+    const query =
+      interaction.options.getString("query") ||
+      "https://an01.cdn.eurozet.pl/ANTCLA.mp3?redirected=01";
+    const skipChecks = interaction.options.getString("skip-checks");
+    if (!interaction.member.voice.channel || skipChecks === "true")
       return interaction.editReply({
         content: "You need to enter channel",
         ephemeral: true,
@@ -22,7 +39,11 @@ export default {
     if (
       !interaction.member.voice.channel
         .permissionsFor(interaction.guild.members.me)
-        .has(PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak)
+        .has(
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.Speak
+        ) ||
+      skipChecks === "true"
     )
       return interaction.editReply({
         content: "I don't have permission to talk in this voice channel",
@@ -40,10 +61,7 @@ export default {
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
     connection.subscribe(musicplayer);
-    const resource = createAudioResource(
-      "https://an01.cdn.eurozet.pl/ANTCLA.mp3?redirected=01",
-      { inlineVolume: true }
-    );
+    const resource = createAudioResource(query, { inlineVolume: true });
     resource.volume.setVolume(0.3);
     await musicplayer.play(resource);
 
