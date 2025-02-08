@@ -1,7 +1,7 @@
-import "dotenv/config";
 import { execFile } from "child_process";
 
 export default (client) => {
+  if (!client.config.shell_docker) return;
   client.on("messageCreate", async (message) => {
     if (message.author.bot || !message.content.startsWith("?exec ")) return;
 
