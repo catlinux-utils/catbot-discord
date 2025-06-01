@@ -1,8 +1,8 @@
-# discord-catbot-base 🐱
+# catbot-discord 🐱
 
 ## Introduction 🌟
 
-Welcome to **discord-catbot-base**! This project is a foundational framework for creating a Discord bot, specially designed for those who adore cats and wish to integrate cat-themed fun into their Discord experience. Whether you're a beginner or an experienced bot developer, this base makes it easy to build a cat-themed bot with custom features.
+Welcome to **catbot-discord**! This project is a foundational framework for creating a Discord bot, specially designed for those who adore cats and wish to integrate cat-themed fun into their Discord experience. Whether you're a beginner or an experienced bot developer, this base makes it easy to build a cat-themed bot with custom features.
 
 ## Features 😺
 
@@ -13,15 +13,15 @@ Welcome to **discord-catbot-base**! This project is a foundational framework for
 
 ## Installation 🛠️
 
-To install `discord-catbot-base`, follow these steps:
+To install `catbot-discord`, follow these steps:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/ThePolishCat/discord-catbot-base.git
+   git clone https://github.com/catlinux-utils/catbot-discord.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd discord-catbot-base
+   cd catbot-discord
    ```
 3. Install dependencies:
    ```bash
@@ -30,7 +30,7 @@ To install `discord-catbot-base`, follow these steps:
 
 ## Usage 🚀
 
-To use `discord-catbot-base`, follow these steps:
+To use `catbot-discord`, follow these steps:
 
 1. Create a `.env` file in the root directory and add your bot token and id.
 2. Run the bot:
@@ -40,15 +40,15 @@ To use `discord-catbot-base`, follow these steps:
 
 ## Contributing 🤝
 
-Contributions to `discord-catbot-base` are welcome! If you have suggestions or improvements, feel free to fork the repository and create a pull request. Please adhere to the project's code of conduct.
+Contributions to `catbot-discord` are welcome! If you have suggestions or improvements, feel free to fork the repository and create a pull request. Please adhere to the project's code of conduct.
 
 ## License 📜
 
-`discord-catbot-base` is released under the [GNU GPLv3 License](LICENSE). See the `LICENSE` file for more details.
+`catbot-discord` is released under the [GNU GPLv3 License](LICENSE). See the `LICENSE` file for more details.
 
 ## Acknowledgments 🎉
 
-A special thanks to everyone who has contributed to making `discord-catbot-base` a fun and engaging project!
+A special thanks to everyone who has contributed to making `catbot-discord` a fun and engaging project!
 
 ---
 
