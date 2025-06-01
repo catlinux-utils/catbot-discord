@@ -14,6 +14,8 @@ export default {
     .setDescription("Cats images.")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
+  ownerOnly: true,
+
   run: async (interaction) => {
     await interaction.deferReply();
     const { image, title, tries } = await getRandomCat();
