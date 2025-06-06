@@ -1,1 +1,1 @@
-{ "shell_docker": false, "ollama_ai": false }
+{ "shell_docker": false, "ollama_ai": true }

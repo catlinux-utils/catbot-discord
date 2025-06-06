@@ -47,5 +47,14 @@ export default (client) => {
         });
       }
     }
+    if (interaction.isAutocomplete()) {
+      const command = client.commands.get(interaction.commandName);
+      if (!command) return;
+      try {
+        await command.autocomplete(interaction, client);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   });
 };

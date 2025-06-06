@@ -12,7 +12,7 @@ export default (client) => {
     const command = message.content.slice(4).trim();
     const msg = await message.reply("Loading...");
     const response = await ollama.chat({
-      model: "catbot",
+      model: "gemma3:4b-it-q8_0",
       messages: [{ role: "user", content: command }],
       stream: true,
     });
@@ -20,10 +20,27 @@ export default (client) => {
     let timer = 0;
     for await (const part of response) {
       fullMessage += part.message.content;
-      timer += 1;
-      if (timer === 5) {
-        await msg.edit(fullMessage);
-        timer = 0;
+      if (fullMessage.length <= 2000) {
+        timer += 1;
+        if (timer === 15) {
+          await msg.edit(fullMessage);
+          timer = 0;
+        }
+      }
+      if (part.done) {
+        if (fullMessage.length <= 2000) {
+          await msg.edit(fullMessage);
+        } else {
+          await msg.edit("Response is too long. Sending as a file...");
+          await message.channel.send({
+            files: [
+              {
+                attachment: Buffer.from(fullMessage),
+                name: "response.txt",
+              },
+            ],
+          });
+        }
       }
     }
   });
