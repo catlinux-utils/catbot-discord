@@ -17,9 +17,26 @@ export default {
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("stop").setDescription("Stop song")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("pause").setDescription("Pause song")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("skip").setDescription("Skip song")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("volume")
+        .setDescription("Change volume")
+        .addIntegerOption((option) =>
+          option
+            .setName("value")
+            .setDescription("Volume level (0-10)")
+            .setRequired(true)
+            .setMinValue(0)
+            .setMaxValue(10)
+        )
     ),
-  ownerOnly: true,
-
   run: async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand();
     const voiceChannel = interaction.member.voice.channel;
@@ -59,6 +76,25 @@ export default {
         }
         case "stop": {
           await client.musicsystem.stop(interaction);
+          return await interaction.editReply({
+            content: "🎶 Request received.",
+          });
+        }
+        case "pause": {
+          await client.musicsystem.pause(interaction);
+          return await interaction.editReply({
+            content: "🎶 Request received.",
+          });
+        }
+        case "skip": {
+          await client.musicsystem.skip(interaction);
+          return await interaction.editReply({
+            content: "🎶 Request received.",
+          });
+        }
+        case "volume": {
+          const volume = interaction.options.getInteger("value");
+          await client.musicsystem.volume(interaction, volume);
           return await interaction.editReply({
             content: "🎶 Request received.",
           });

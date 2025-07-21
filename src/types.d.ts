@@ -1,5 +1,5 @@
 import { Collection } from "discord.js";
-import MusicSystem from "./utils/music-system";
+import MusicSystem from "./utils/music-system.ts";
 
 declare module "discord.js" {
   interface Client {

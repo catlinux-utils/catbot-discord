@@ -14,22 +14,22 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
-    "axios": "^1.9.0",
-    "canvas": "^3.1.0",
+    "axios": "^1.10.0",
+    "canvas": "^3.1.2",
     "chalk": "^5.4.1",
-    "discord.js": "^14.19.3",
-    "dotenv": "^16.5.0",
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.2.0",
     "duck-duck-scrape": "^2.2.7",
     "gifenc": "^1.0.3",
     "lowdb": "^7.0.1",
     "ollama": "^0.5.16",
     "opusscript": "^0.1.1",
     "sodium": "^3.0.2",
-    "youtubei": "^1.6.7"
+    "youtubei": "^1.7.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "eslint": "^9.28.0",
-    "globals": "^16.2.0"
+    "@eslint/js": "^9.31.0",
+    "eslint": "^9.31.0",
+    "globals": "^16.3.0"
   }
 }
