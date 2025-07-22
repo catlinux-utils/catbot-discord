@@ -16,7 +16,6 @@ import {
   TextChannel,
   VoiceChannel,
   CommandInteraction,
-  Guild,
 } from "discord.js";
 import { MusicClient, Client as YoutubeClient } from "youtubei";
 
@@ -83,11 +82,7 @@ class MusicSystem {
 
     // Validate input
     if (!query) {
-      await this.sendError(
-        textChannel,
-        interaction,
-        "Please provide a valid query or URL"
-      );
+      await this.sendError(interaction, "Please provide a valid query or URL");
       return;
     }
 
@@ -104,7 +99,7 @@ class MusicSystem {
       }
 
       if (songs.length === 0) {
-        await this.sendError(textChannel, interaction, "No valid songs found");
+        await this.sendError(interaction, "No valid songs found");
         return;
       }
 
@@ -123,11 +118,7 @@ class MusicSystem {
       );
     } catch (err) {
       this.client.logs.error("Error processing play request", err);
-      await this.sendError(
-        textChannel,
-        interaction,
-        "Failed to process the request"
-      );
+      await this.sendError(interaction, "Failed to process the request");
     }
   }
 
@@ -364,13 +355,12 @@ class MusicSystem {
   }
 
   private async sendError(
-    textChannel: TextChannel,
     interaction: CommandInteraction | undefined,
     message: string
   ): Promise<void> {
     const serverQueue = this.queue.get(interaction.guild.id);
     if (interaction) {
-      await interaction.reply({ content: message, ephemeral: true });
+      await interaction.followUp({ content: message, ephemeral: true });
     } else {
       await serverQueue.textChannel.send(message);
     }

@@ -67,37 +67,37 @@ export default {
       switch (subcommand) {
         case "play": {
           const query = interaction.options.getString("query");
+          await interaction.editReply({
+            content: "🎶 Request received.",
+          });
           await client.musicsystem.play(voiceChannel, query, {
             textChannel: interaction.channel,
           });
-          return await interaction.editReply({
-            content: "🎶 Request received.",
-          });
         }
         case "stop": {
-          await client.musicsystem.stop(interaction);
-          return await interaction.editReply({
+          await interaction.editReply({
             content: "🎶 Request received.",
           });
+          await client.musicsystem.stop(interaction);
         }
         case "pause": {
-          await client.musicsystem.pause(interaction);
-          return await interaction.editReply({
+          await interaction.editReply({
             content: "🎶 Request received.",
           });
+          await client.musicsystem.pause(interaction);
         }
         case "skip": {
-          await client.musicsystem.skip(interaction);
-          return await interaction.editReply({
+          await interaction.editReply({
             content: "🎶 Request received.",
           });
+          await client.musicsystem.skip(interaction);
         }
         case "volume": {
           const volume = interaction.options.getInteger("value");
-          await client.musicsystem.volume(interaction, volume);
-          return await interaction.editReply({
+          await interaction.editReply({
             content: "🎶 Request received.",
           });
+          await client.musicsystem.volume(interaction, volume);
         }
       }
     } catch (err) {
