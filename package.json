@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
+    "@discordjs/opus": "*",
     "axios": "^1.10.0",
     "canvas": "^3.1.2",
     "chalk": "^5.4.1",
@@ -23,8 +24,6 @@
     "gifenc": "^1.0.3",
     "lowdb": "^7.0.1",
     "ollama": "^0.5.16",
-    "opusscript": "^0.1.1",
-    "sodium": "^3.0.2",
     "youtubei": "^1.7.0"
   },
   "devDependencies": {

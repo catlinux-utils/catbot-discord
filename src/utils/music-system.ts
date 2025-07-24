@@ -80,20 +80,20 @@ class MusicSystem {
     const guildId = voiceChannel.guild.id;
     let songs: Song[] = [];
 
-    // Validate input
     if (!query) {
       await this.sendError(interaction, "Please provide a valid query or URL");
       return;
     }
 
-    // Handle YouTube playlist or single video
     const playlistRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com|music\.youtube\.com)\/(playlist\?list=|watch\?.*list=)([^&]+)/;
-    const isPlaylist = query.match(playlistRegex);
+      /^(https?:\/\/)?(www\.)?(youtube\.com|music\.youtube\.com)\/(?:(watch\?v=([^&]+)&list=([^&]+))|(playlist\?list=([^&]+)))/;
+    const match = query.match(playlistRegex);
 
     try {
-      if (isPlaylist) {
-        songs = await this.getPlaylistSongs(isPlaylist[5]);
+      if (match) {
+        const videoId = match[5];
+        const playlistId = match[6];
+        songs = await this.getPlaylistSongs(playlistId, videoId);
       } else {
         songs = await this.getSingleSong(query);
       }
@@ -103,8 +103,7 @@ class MusicSystem {
         return;
       }
 
-      // If radio is enabled, add similar songs
-      if (radio && songs.length > 0) {
+      if (radio && songs.length === 1) {
         const similarSongs = await this.getSimilarSongs(songs[0]);
         songs.push(...similarSongs);
       }
@@ -122,22 +121,53 @@ class MusicSystem {
     }
   }
 
-  private async getPlaylistSongs(playlistId: string): Promise<Song[]> {
+  private async getPlaylistSongs(
+    playlistId: string,
+    videoId?: string
+  ): Promise<Song[]> {
     const songs: Song[] = [];
     try {
       const playlist = await this.youtube.getPlaylist(playlistId);
-
       if (!playlist || !playlist.videos || playlist.videoCount === 0) {
         return songs;
       }
+      await playlist.videos.next(0);
+      // If a specific video ID is provided, fetch and add it first
+      if (videoId) {
+        try {
+          const video = await this.youtube.getVideo(videoId);
+          if (video && video.title && video.duration) {
+            songs.push({
+              url: `https://www.youtube.com/watch?v=${video.id}`,
+              title: video.title,
+              duration: video.duration,
+            });
+          }
+        } catch (err) {
+          this.client.logs.error(`Error fetching video ${videoId}`, err);
+        }
+      }
 
+      // Add remaining playlist videos, excluding the specific video if already added
       playlist.videos.items.forEach((video) => {
-        songs.push({
-          url: `https://www.youtube.com/watch?v=${video.id}`,
-          title: video.title,
-          duration: video.duration,
-        });
+        if (video.id !== videoId) {
+          songs.push({
+            url: `https://www.youtube.com/watch?v=${video.id}`,
+            title: video.title,
+            duration: video.duration,
+          });
+        }
       });
+
+      // Shuffle the remaining songs (excluding the first one if videoId was provided)
+      if (songs.length > 1 && videoId) {
+        const firstSong = songs[0];
+        const remainingSongs = songs
+          .slice(1)
+          .sort(() => Math.random() - 0.5)
+          .slice(0, 100);
+        return [firstSong, ...remainingSongs];
+      }
 
       return songs.sort(() => Math.random() - 0.5);
     } catch (err) {
@@ -183,7 +213,7 @@ class MusicSystem {
 
       return related.related.items
         .filter((item) => item.type === "video" && item.id && item.title)
-        .slice(0, 5)
+        .slice(0, 20)
         .map((item) => ({
           url: `https://www.youtube.com/watch?v=${item.id}`,
           title: item.title,
@@ -276,6 +306,9 @@ class MusicSystem {
       queue.player.once(AudioPlayerStatus.Idle, () =>
         this.handleSongEnd(queue)
       );
+      queue.player.on("error", (error) => {
+        this.client.logs.error("player error", error);
+      });
       await this.sendNowPlayingEmbed(queue, song);
     } catch (err) {
       this.client.logs.error("Error playing song", err);
@@ -358,10 +391,12 @@ class MusicSystem {
     interaction: CommandInteraction | undefined,
     message: string
   ): Promise<void> {
-    const serverQueue = this.queue.get(interaction.guild.id);
+    const serverQueue = interaction?.guild?.id
+      ? this.queue.get(interaction.guild.id)
+      : undefined;
     if (interaction) {
       await interaction.followUp({ content: message, ephemeral: true });
-    } else {
+    } else if (serverQueue) {
       await serverQueue.textChannel.send(message);
     }
   }
@@ -383,18 +418,16 @@ class MusicSystem {
 
   async stop(interaction: CommandInteraction): Promise<void> {
     if (!interaction.guild) {
-      await interaction.reply({
+      await interaction.editReply({
         content: "This command must be used in a server!",
-        ephemeral: true,
       });
       return;
     }
 
     const serverQueue = this.queue.get(interaction.guild.id);
     if (!serverQueue) {
-      await interaction.reply({
+      await interaction.editReply({
         content: "No queue to stop!",
-        ephemeral: true,
       });
       return;
     }
@@ -405,18 +438,13 @@ class MusicSystem {
 
   async skip(interaction: CommandInteraction): Promise<void> {
     if (!interaction.guild) {
-      await interaction.reply({
-        content: "This command must be used in a server!",
-        ephemeral: true,
-      });
       return;
     }
 
     const serverQueue = this.queue.get(interaction.guild.id);
     if (!serverQueue) {
-      await interaction.reply({
+      await interaction.editReply({
         content: "No queue to skip!",
-        ephemeral: true,
       });
       return;
     }
@@ -436,23 +464,21 @@ class MusicSystem {
 
     const serverQueue = this.queue.get(interaction.guild.id);
     if (!serverQueue) {
-      await interaction.reply({
+      await interaction.editReply({
         content: "No queue to pause!",
-        ephemeral: true,
       });
       return;
     }
 
     if (serverQueue.player.state.status === AudioPlayerStatus.Paused) {
-      await interaction.reply({
+      await serverQueue.textChannel.send({
         content: "The player is already paused!",
-        ephemeral: true,
       });
       return;
     }
 
     serverQueue.player.pause();
-    await interaction.editReply("Paused the player");
+    await serverQueue.textChannel.send("Paused the player");
   }
 
   async resume(interaction: CommandInteraction): Promise<void> {
@@ -504,9 +530,8 @@ class MusicSystem {
 
     const serverQueue = this.queue.get(interaction.guild.id);
     if (!serverQueue) {
-      await interaction.reply({
+      await interaction.editReply({
         content: "No queue to change volume!",
-        ephemeral: true,
       });
       return;
     }

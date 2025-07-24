@@ -14,6 +14,9 @@ export default {
             .setDescription("Provide name of the song")
             .setRequired(true)
         )
+        .addBooleanOption((option) =>
+          option.setName("radio").setDescription("Turn on radio?")
+        )
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("stop").setDescription("Stop song")
@@ -67,11 +70,13 @@ export default {
       switch (subcommand) {
         case "play": {
           const query = interaction.options.getString("query");
+          const radio = interaction.options.getBoolean("radio");
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          await client.musicsystem.play(voiceChannel, query, {
+          return await client.musicsystem.play(voiceChannel, query, {
             textChannel: interaction.channel,
+            radio: radio,
           });
         }
         case "stop": {
@@ -84,20 +89,20 @@ export default {
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          await client.musicsystem.pause(interaction);
+          return await client.musicsystem.pause(interaction);
         }
         case "skip": {
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          await client.musicsystem.skip(interaction);
+          return await client.musicsystem.skip(interaction);
         }
         case "volume": {
           const volume = interaction.options.getInteger("value");
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          await client.musicsystem.volume(interaction, volume);
+          return await client.musicsystem.volume(interaction, volume);
         }
       }
     } catch (err) {
