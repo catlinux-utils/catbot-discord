@@ -13,8 +13,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/voice": "^0.18.0",
     "@discordjs/opus": "*",
+    "@discordjs/voice": "^0.18.0",
+    "@sefinek/google-tts-api": "^2.1.10",
     "axios": "^1.10.0",
     "canvas": "^3.1.2",
     "chalk": "^5.4.1",
@@ -22,6 +23,7 @@
     "dotenv": "^17.2.0",
     "duck-duck-scrape": "^2.2.7",
     "gifenc": "^1.0.3",
+    "groq-sdk": "^0.29.0",
     "lowdb": "^7.0.1",
     "ollama": "^0.5.16",
     "youtubei": "^1.7.0"

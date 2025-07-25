@@ -21,6 +21,7 @@ import { MusicClient, Client as YoutubeClient } from "youtubei";
 
 interface Song {
   url: string;
+  id?: string;
   title?: string;
   duration?: number;
 }
@@ -105,6 +106,7 @@ class MusicSystem {
 
       if (radio && songs.length === 1) {
         const similarSongs = await this.getSimilarSongs(songs[0]);
+        console.log(similarSongs);
         songs.push(...similarSongs);
       }
 
@@ -139,6 +141,7 @@ class MusicSystem {
           if (video && video.title && video.duration) {
             songs.push({
               url: `https://www.youtube.com/watch?v=${video.id}`,
+              id: video.id,
               title: video.title,
               duration: video.duration,
             });
@@ -153,6 +156,7 @@ class MusicSystem {
         if (video.id !== videoId) {
           songs.push({
             url: `https://www.youtube.com/watch?v=${video.id}`,
+            id: video.id,
             title: video.title,
             duration: video.duration,
           });
@@ -193,6 +197,7 @@ class MusicSystem {
       return [
         {
           url: `https://www.youtube.com/watch?v=${results[0].items[0].id}`,
+          id: results[0].items[0].id,
           title: results[0].items[0].title,
           duration: results[0].items[0].duration,
         },
@@ -205,10 +210,9 @@ class MusicSystem {
 
   private async getSimilarSongs(song: Song): Promise<Song[]> {
     try {
-      const videoId = song.url.match(/(?:v=|youtu\.be\/)([^&]+)/)?.[1];
-      if (!videoId) return [];
+      if (!song.id) return [];
 
-      const related = await this.youtube.getVideo(videoId);
+      const related = await this.youtube.getVideo(song.id);
       if (!related?.related?.items) return [];
 
       return related.related.items
@@ -216,6 +220,7 @@ class MusicSystem {
         .slice(0, 20)
         .map((item) => ({
           url: `https://www.youtube.com/watch?v=${item.id}`,
+          id: item.id,
           title: item.title,
           duration: item.duration,
         }));
