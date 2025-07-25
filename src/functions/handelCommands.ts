@@ -8,7 +8,7 @@ export default async (client) => {
   for (const folder of commandFolders) {
     const commandFiles = fs
       .readdirSync(`${process.cwd()}/src/commands/${folder}`)
-      .filter((file) => file.endsWith(".js"));
+      .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
     client.categoriesArray.push(folder);
     for (const file of commandFiles) {
       const command = await import(

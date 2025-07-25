@@ -1,5 +1,3 @@
-import "dotenv/config";
-
 export default (client) => {
   client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {

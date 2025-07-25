@@ -1,21 +1,29 @@
+import { SlashCommandBuilder } from "discord.js";
+
 import { getAudioBase64 } from "@sefinek/google-tts-api";
+
 import {
   joinVoiceChannel,
   createAudioPlayer,
   createAudioResource,
-  AudioPlayerStatus,
 } from "@discordjs/voice";
 
 import { PassThrough } from "stream";
 
-export default (client) => {
-  client.on("messageCreate", async (message) => {
-    if (message.author.bot || !message.content.startsWith("?tts ")) return;
+export default {
+  data: new SlashCommandBuilder()
+    .setName("tts-voice")
+    .setDescription("Speak tts in voide channel")
+    .setIntegrationTypes([0, 1])
+    .setContexts([0, 1, 2])
+    .addStringOption((option) =>
+      option.setName("text").setDescription("Text for say").setRequired(true)
+    ),
+  run: async (interaction, client) => {
+    await interaction.deferReply();
+    const args = interaction.options.getString("text");
 
-    const args = message.content.slice("?tts".length).trim();
-    if (!args) return;
-
-    const voiceChannel = message.member?.voice?.channel;
+    const voiceChannel = interaction.member?.voice?.channel;
     if (!voiceChannel) return;
 
     try {
@@ -42,21 +50,13 @@ export default (client) => {
       player.play(resource);
       connection.subscribe(player);
 
-      player.pause();
-      setTimeout(() => {
-        player.unpause();
-      }, 1000);
-
-      /*player.on(AudioPlayerStatus.Idle, () => {
-        connection.destroy();
-      });*/
-
       player.on("error", (error) => {
         client.logs.error("Player error:", error);
         connection.destroy();
       });
+      return await interaction.editReply("ok");
     } catch (error) {
       client.logs.error("Error:", error);
     }
-  });
+  },
 };
