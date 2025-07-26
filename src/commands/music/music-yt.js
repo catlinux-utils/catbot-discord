@@ -83,7 +83,7 @@ export default {
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          await client.musicsystem.stop(interaction);
+          return await client.musicsystem.stop(interaction);
         }
         case "pause": {
           await interaction.editReply({
