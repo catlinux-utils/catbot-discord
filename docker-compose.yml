@@ -4,4 +4,4 @@ services:
     container_name: catbot-discord
     env_file:
       - .env
-    restart: unless-stopped
+    #restart: unless-stopped
