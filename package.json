@@ -24,6 +24,7 @@
     "duck-duck-scrape": "^2.2.7",
     "gifenc": "^1.0.3",
     "groq-sdk": "^0.29.0",
+    "libsodium-wrappers": "^0.7.15",
     "lowdb": "^7.0.1",
     "ollama": "^0.5.16",
     "youtubei": "^1.7.0"

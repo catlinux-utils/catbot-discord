@@ -1,0 +1,7 @@
+services:
+  bot:
+    build: .
+    container_name: catbot-discord
+    env_file:
+      - .env
+    restart: unless-stopped

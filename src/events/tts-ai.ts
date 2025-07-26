@@ -1,16 +1,13 @@
-import { getAudioBase64, getAllAudioBase64 } from "@sefinek/google-tts-api";
+import { getAllAudioBase64 } from "@sefinek/google-tts-api";
 import Groq from "groq-sdk";
 
 import {
   joinVoiceChannel,
   createAudioPlayer,
   createAudioResource,
-  AudioPlayerStatus,
 } from "@discordjs/voice";
 
 import { PassThrough } from "stream";
-
-const groq = new Groq({ apiKey: process.env.groq });
 
 export default (client) => {
   client.on("messageCreate", async (message) => {
@@ -30,6 +27,7 @@ export default (client) => {
         guildId: voiceChannel.guild.id,
         adapterCreator: voiceChannel.guild.voiceAdapterCreator,
       });
+      const groq = new Groq({ apiKey: process.env.groq });
 
       const ai = await groq.chat.completions.create({
         messages: [
@@ -65,15 +63,6 @@ export default (client) => {
       const resource = createAudioResource(audioStream);
       player.play(resource);
       connection.subscribe(player);
-
-      player.pause();
-      setTimeout(() => {
-        player.unpause();
-      }, 1000);
-
-      /*player.on(AudioPlayerStatus.Idle, () => {
-        connection.destroy();
-      });*/
 
       player.on("error", (error) => {
         client.logs.error("Player error:", error);
