@@ -18,7 +18,7 @@ RUN apk update && \
     giflib-dev
 
 COPY package.json /usr/src/bot
-RUN npm install --production
+RUN npm install --omit=dev
 
 COPY . /usr/src/bot
 

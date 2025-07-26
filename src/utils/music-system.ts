@@ -414,11 +414,9 @@ class MusicSystem {
 
   private stopQueue(guildId: string): void {
     const serverQueue = this.queue.get(guildId);
-    if (serverQueue) {
-      serverQueue.player.stop();
-      serverQueue.connection?.destroy();
-      this.queue.delete(guildId);
-    }
+    serverQueue.player.stop();
+    serverQueue?.connection?.destroy();
+    this.queue.delete(guildId);
   }
 
   async stop(interaction: CommandInteraction): Promise<void> {
