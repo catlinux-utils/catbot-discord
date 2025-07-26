@@ -23,19 +23,17 @@ To install `catbot-discord`, follow these steps:
    ```bash
    cd catbot-discord
    ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
 
 ## Usage 🚀
 
 To use `catbot-discord`, follow these steps:
 
-1. Create a `.env` file in the root directory and add your bot token and id.
+1. Create a `.env` file in the root directory and add your bot token.
 2. Run the bot:
+
    ```bash
-   npm start
+   docker compose up -d --build
+
    ```
 
 ## Contributing 🤝

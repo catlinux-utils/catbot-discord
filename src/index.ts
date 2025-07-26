@@ -14,10 +14,6 @@ const client = new Client({
   ],
 });
 
-client.config = (
-  await import(`${process.cwd()}/config.json`, { with: { type: "json" } })
-).default;
-
 client.logs = logger;
 
 client.musicsystem = new MusicSystem(client);
