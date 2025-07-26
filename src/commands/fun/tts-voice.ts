@@ -8,7 +8,7 @@ import {
   createAudioResource,
 } from "@discordjs/voice";
 
-import { PassThrough } from "stream";
+import { PassThrough } from "node:stream";
 
 export default {
   data: new SlashCommandBuilder()

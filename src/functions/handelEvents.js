@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 
 export default async (client) => {
   const events = fs.readdirSync(`${process.cwd()}/src/events`);

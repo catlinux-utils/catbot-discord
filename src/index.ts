@@ -1,5 +1,5 @@
-import { Client, GatewayIntentBits, Collection } from "discord.js";
-import fs from "fs";
+import { Client, GatewayIntentBits, Collection, Options } from "discord.js";
+import fs from "node:fs";
 import MusicSystem from "./utils/music-system.ts";
 import logger from "./utils/logging.ts";
 
@@ -12,6 +12,18 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildVoiceStates,
   ],
+  sweepers: {
+    ...Options.DefaultSweeperSettings,
+    messages: {
+      interval: 300,
+      lifetime: 300,
+    },
+    users: {
+      interval: 300,
+      lifetime: 7200,
+      filter: () => (user) => user.id !== user.client.user.id,
+    },
+  },
 });
 
 client.logs = logger;
