@@ -17,11 +17,12 @@ import {
   VoiceChannel,
   CommandInteraction,
 } from "discord.js";
-import { MusicClient, Client as YoutubeClient } from "youtubei";
+//import { MusicClient, Client as YoutubeClient } from "youtubei";
+import ffmpeg from "fluent-ffmpeg";
+import { getYouTubeInfo } from "./music-utils/yt-dlp-info.ts";
 
 interface Song {
   url: string;
-  id?: string;
   title?: string;
   duration?: number;
 }
@@ -40,14 +41,10 @@ interface Queue {
 
 class MusicSystem {
   private queue: Map<string, Queue>;
-  private youtube: YoutubeClient;
-  private music: MusicClient;
   private client: Client;
 
   constructor(client: Client) {
     this.queue = new Map();
-    this.youtube = new YoutubeClient();
-    this.music = new MusicClient();
     this.client = client;
 
     client.on("voiceStateUpdate", (oldState, newState) => {
@@ -71,11 +68,9 @@ class MusicSystem {
     {
       textChannel,
       interaction,
-      radio = false,
     }: {
       textChannel: TextChannel;
       interaction?: CommandInteraction;
-      radio?: boolean;
     }
   ): Promise<void> {
     const guildId = voiceChannel.guild.id;
@@ -86,28 +81,27 @@ class MusicSystem {
       return;
     }
 
-    const playlistRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com|music\.youtube\.com)\/(?:(watch\?v=([^&]+)&list=([^&]+))|(playlist\?list=([^&]+)))/;
-    const match = query.match(playlistRegex);
-
     try {
-      if (match) {
-        const videoId = match[5];
-        const playlistId = match[6];
-        songs = await this.getPlaylistSongs(playlistId, videoId);
+      const info = await getYouTubeInfo(query);
+      if (info.playlist_items) {
+        info.playlist_items.forEach((data) => {
+          songs.push({
+            url: data.webpage_url,
+            title: data.title,
+            duration: data.duration,
+          });
+        });
       } else {
-        songs = await this.getSingleSong(query);
+        songs.push({
+          url: info.webpage_url,
+          title: info.title,
+          duration: info.duration,
+        });
       }
 
       if (songs.length === 0) {
         await this.sendError(interaction, "No valid songs found");
         return;
-      }
-
-      if (radio && songs.length === 1) {
-        const similarSongs = await this.getSimilarSongs(songs[0]);
-        console.log(similarSongs);
-        songs.push(...similarSongs);
       }
 
       await this.addToQueue(
@@ -120,113 +114,6 @@ class MusicSystem {
     } catch (err) {
       this.client.logs.error("Error processing play request", err);
       await this.sendError(interaction, "Failed to process the request");
-    }
-  }
-
-  private async getPlaylistSongs(
-    playlistId: string,
-    videoId?: string
-  ): Promise<Song[]> {
-    const songs: Song[] = [];
-    try {
-      const playlist = await this.youtube.getPlaylist(playlistId);
-      if (!playlist || !playlist.videos || playlist.videoCount === 0) {
-        return songs;
-      }
-      await playlist.videos.next(0);
-      // If a specific video ID is provided, fetch and add it first
-      if (videoId) {
-        try {
-          const video = await this.youtube.getVideo(videoId);
-          if (video && video.title && video.duration) {
-            songs.push({
-              url: `https://www.youtube.com/watch?v=${video.id}`,
-              id: video.id,
-              title: video.title,
-              duration: video.duration,
-            });
-          }
-        } catch (err) {
-          this.client.logs.error(`Error fetching video ${videoId}`, err);
-        }
-      }
-
-      // Add remaining playlist videos, excluding the specific video if already added
-      playlist.videos.items.forEach((video) => {
-        if (video.id !== videoId) {
-          songs.push({
-            url: `https://www.youtube.com/watch?v=${video.id}`,
-            id: video.id,
-            title: video.title,
-            duration: video.duration,
-          });
-        }
-      });
-
-      // Shuffle the remaining songs (excluding the first one if videoId was provided)
-      if (songs.length > 1 && videoId) {
-        const firstSong = songs[0];
-        const remainingSongs = songs
-          .slice(1)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 100);
-        return [firstSong, ...remainingSongs];
-      }
-
-      return songs.sort(() => Math.random() - 0.5);
-    } catch (err) {
-      this.client.logs.error("Error fetching playlist", err);
-      return [];
-    }
-  }
-
-  private async getSingleSong(query: string): Promise<Song[]> {
-    const urlRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/(watch\?v=|shorts\/)?([^&]+)/;
-
-    if (query.match(urlRegex)) {
-      return [{ url: query }];
-    }
-
-    try {
-      const results = await this.music.search(query);
-      if (results[0]?.items.length === 0) {
-        return [];
-      }
-
-      return [
-        {
-          url: `https://www.youtube.com/watch?v=${results[0].items[0].id}`,
-          id: results[0].items[0].id,
-          title: results[0].items[0].title,
-          duration: results[0].items[0].duration,
-        },
-      ];
-    } catch (err) {
-      this.client.logs.error("Error searching for song", err);
-      return [];
-    }
-  }
-
-  private async getSimilarSongs(song: Song): Promise<Song[]> {
-    try {
-      if (!song.id) return [];
-
-      const related = await this.youtube.getVideo(song.id);
-      if (!related?.related?.items) return [];
-
-      return related.related.items
-        .filter((item) => item.type === "video" && item.id && item.title)
-        .slice(0, 20)
-        .map((item) => ({
-          url: `https://www.youtube.com/watch?v=${item.id}`,
-          id: item.id,
-          title: item.title,
-          duration: item.duration,
-        }));
-    } catch (err) {
-      this.client.logs.error("Error fetching similar songs", err);
-      return [];
     }
   }
 
@@ -303,7 +190,18 @@ class MusicSystem {
         return;
       }
 
-      const resource = createAudioResource(streamUrl, { inlineVolume: true });
+      // Create an FFmpeg stream using fluent-ffmpeg
+      // const ffmpegStream = ffmpeg(streamUrl)
+      //   .audioCodec("libopus")
+      //   .format("opus")
+      //   .audioChannels(2)
+      //   .audioFrequency(48000)
+      //   .outputOptions(["-analyzeduration", "0", "-loglevel", "verbose"])
+      //   .pipe();
+
+      const resource = createAudioResource(streamUrl, {
+        inlineVolume: true,
+      });
       queue.resource = resource;
       resource.volume?.setVolume(queue.volume / 10);
       queue.player.play(resource);
@@ -312,7 +210,7 @@ class MusicSystem {
         this.handleSongEnd(queue)
       );
       queue.player.on("error", (error) => {
-        this.client.logs.error("player error", error);
+        this.client.logs.error("Player error", error);
       });
       await this.sendNowPlayingEmbed(queue, song);
     } catch (err) {
@@ -414,7 +312,7 @@ class MusicSystem {
 
   private stopQueue(guildId: string): void {
     const serverQueue = this.queue.get(guildId);
-    serverQueue.player.stop();
+    serverQueue?.player.stop();
     serverQueue?.connection?.destroy();
     this.queue.delete(guildId);
   }

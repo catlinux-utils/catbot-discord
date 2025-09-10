@@ -14,15 +14,15 @@ export default {
             .setDescription("Provide name of the song")
             .setRequired(true)
         )
-        .addBooleanOption((option) =>
-          option.setName("radio").setDescription("Turn on radio?")
-        )
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("stop").setDescription("Stop song")
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("pause").setDescription("Pause song")
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("resume").setDescription("Resume song")
     )
     .addSubcommand((subcommand) =>
       subcommand.setName("skip").setDescription("Skip song")
@@ -39,7 +39,9 @@ export default {
             .setMinValue(0)
             .setMaxValue(10)
         )
-    ),
+    )
+    .setIntegrationTypes([0, 1])
+    .setContexts([0, 1, 2]),
   run: async (interaction, client) => {
     const subcommand = interaction.options.getSubcommand();
     const voiceChannel = interaction.member.voice.channel;
@@ -70,13 +72,11 @@ export default {
       switch (subcommand) {
         case "play": {
           const query = interaction.options.getString("query");
-          const radio = interaction.options.getBoolean("radio");
           await interaction.editReply({
             content: "🎶 Request received.",
           });
           return await client.musicsystem.play(voiceChannel, query, {
             textChannel: interaction.channel,
-            radio: radio,
           });
         }
         case "stop": {
@@ -90,6 +90,12 @@ export default {
             content: "🎶 Request received.",
           });
           return await client.musicsystem.pause(interaction);
+        }
+        case "resume": {
+          await interaction.editReply({
+            content: "🎶 Request received.",
+          });
+          return await client.musicsystem.resume(interaction);
         }
         case "skip": {
           await interaction.editReply({
