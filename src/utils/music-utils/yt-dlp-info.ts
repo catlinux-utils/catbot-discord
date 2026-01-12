@@ -86,14 +86,14 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeInfo> {
         result.title = videoInfo.title || "Unknown Title";
         result.uploader = videoInfo.uploader || "Unknown Uploader";
         result.duration = videoInfo.duration || 0;
-        result.webpage_url = videoInfo.url || url;
+        result.webpage_url = videoInfo.webpage_url || url;
       }
     } else {
       result.type = "video";
       result.title = jsonOutput.title || "Unknown Title";
       result.uploader = jsonOutput.uploader || "Unknown Uploader";
       result.duration = jsonOutput.duration || 0;
-      result.webpage_url = jsonOutput.url || url;
+      result.webpage_url = jsonOutput.webpage_url || url;
     }
 
     return result;
