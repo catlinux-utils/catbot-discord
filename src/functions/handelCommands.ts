@@ -25,7 +25,7 @@ export default async (client) => {
   }
   client.logs.info(`Loaded ${client.commandArray.length} commands`);
 
-  client.on("ready", async () => {
+  client.on("clientReady", async () => {
     await client.application.commands
       .set(client.commandArray)
       .catch(console.error);

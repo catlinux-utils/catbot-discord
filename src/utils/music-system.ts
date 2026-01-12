@@ -189,7 +189,6 @@ class MusicSystem {
         await this.handleSongError(queue, "Failed to get stream URL");
         return;
       }
-
       // Create an FFmpeg stream using fluent-ffmpeg
       // const ffmpegStream = ffmpeg(streamUrl)
       //   .audioCodec("libopus")
