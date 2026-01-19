@@ -12,7 +12,10 @@ export default {
     .setName("music-radio")
     .setDescription("Play music radio")
     .addStringOption((option) =>
-      option.setName("query").setDescription("Query to play").setRequired(false)
+      option
+        .setName("query")
+        .setDescription("Query to play")
+        .setRequired(false),
     )
     .addStringOption((option) =>
       option
@@ -21,7 +24,10 @@ export default {
         .addChoices([
           { name: "true", value: "true" },
           { name: "false", value: "false" },
-        ])
+        ]),
+    )
+    .addChannelOption((option) =>
+      option.setName("channel").setDescription("Channel").setRequired(false),
     ),
   ownerOnly: true,
   run: async (interaction, client) => {
@@ -31,19 +37,24 @@ export default {
       interaction.options.getString("query") ||
       "https://an01.cdn.eurozet.pl/ANTCLA.mp3?redirected=01";
     const skipChecks = interaction.options.getString("skip-checks");
-    if (!interaction.member.voice.channel || skipChecks === "true")
+
+    const channel =
+      interaction.options.getChannel("channel") ||
+      interaction.member.voice.channel;
+
+    if (!channel && skipChecks !== "true")
       return interaction.editReply({
         content: "You need to enter channel",
         ephemeral: true,
       });
     if (
-      !interaction.member.voice.channel
+      !channel
         .permissionsFor(interaction.guild.members.me)
         .has(
           PermissionsBitField.Flags.Connect,
-          PermissionsBitField.Flags.Speak
-        ) ||
-      skipChecks === "true"
+          PermissionsBitField.Flags.Speak,
+        ) &&
+      skipChecks !== "true"
     )
       return interaction.editReply({
         content: "I don't have permission to talk in this voice channel",
@@ -56,13 +67,13 @@ export default {
     });
 
     const connection = await joinVoiceChannel({
-      channelId: interaction.member.voice.channel.id,
+      channelId: channel.id,
       guildId: interaction.guild.id,
       adapterCreator: interaction.guild.voiceAdapterCreator,
     });
     connection.subscribe(musicplayer);
     const resource = createAudioResource(query, { inlineVolume: true });
-    resource.volume.setVolume(0.3);
+    //resource.volume.setVolume(0.5);
     await musicplayer.play(resource);
 
     client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
@@ -91,6 +102,6 @@ export default {
       connection.destroy();
     });
 
-    await interaction.editReply("Playing radio");
+    await interaction.editReply("Playing sound");
   },
 };
