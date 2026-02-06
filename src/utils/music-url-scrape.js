@@ -5,22 +5,23 @@ export async function getYouTubeStreamUrl(videoUrl) {
     if (!videoUrl) {
       return reject(new Error("Video URL is required"));
     }
-    exec(`yt-dlp --get-url ${videoUrl}`, (error, stdout, stderr) => {
-      if (error) {
-        return reject(
-          new Error(
-            `Error executing yt-dlp: ${stderr.trim() || error.message}`,
-          ),
-        );
-      }
-      console.log(error, stdout, stderr);
-      const streamUrl = stdout.trim().split("\n")[0];
-      console.log(streamUrl);
-      if (!streamUrl) {
-        return reject(new Error("Failed to retrieve stream URL."));
-      }
+    exec(
+      `yt-dlp --get-url --format bestaudio ${videoUrl}`,
+      (error, stdout, stderr) => {
+        if (error) {
+          return reject(
+            new Error(
+              `Error executing yt-dlp: ${stderr.trim() || error.message}`,
+            ),
+          );
+        }
+        const streamUrl = stdout.trim().split("\n")[0];
+        if (!streamUrl) {
+          return reject(new Error("Failed to retrieve stream URL."));
+        }
 
-      resolve(streamUrl);
-    });
+        resolve(streamUrl);
+      },
+    );
   });
 }
