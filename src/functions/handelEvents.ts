@@ -6,7 +6,7 @@ export default async function handelEvents(client: Client): Promise<void> {
   for (const event of events) {
     const eventHandler = await import(`${process.cwd()}/src/events/${event}`);
     if (eventHandler && typeof eventHandler.default === "function") {
-      eventHandler.default(client as any);
+      eventHandler.default(client);
     }
   }
   client.logs?.info?.(`Loaded ${events.length} events`);

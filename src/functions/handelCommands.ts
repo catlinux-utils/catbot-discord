@@ -1,5 +1,9 @@
 import fs from "node:fs";
-import { SlashCommandBuilder, type Client } from "discord.js";
+import {
+  SlashCommandBuilder,
+  type Client,
+  type ApplicationCommandDataResolvable,
+} from "discord.js";
 import type { BotCommand } from "../types.d.ts";
 
 export default async function handelCommands(client: Client): Promise<void> {
@@ -17,22 +21,34 @@ export default async function handelCommands(client: Client): Promise<void> {
       ).default as unknown as BotCommand;
       command.category = folder;
       // store typed command
-      client.commands.set(
-        (command as any).data?.name ?? file.replace(/\.[jt]s$/, ""),
-        command,
-      );
+      // determine command name safely
+      let commandName: string;
       if (command.data instanceof SlashCommandBuilder) {
-        client.commandArray.push((command.data as any).toJSON());
+        commandName = command.data.name;
+        client.commandArray.push(command.data.toJSON());
+      } else if (
+        command.data &&
+        typeof (command.data as any).name === "string"
+      ) {
+        commandName = (command.data as any).name;
+        client.commandArray.push(
+          command.data as ApplicationCommandDataResolvable,
+        );
       } else {
-        client.commandArray.push(command.data as any);
+        commandName = file.replace(/\.[jt]s$/, "");
+        client.commandArray.push(
+          command.data as ApplicationCommandDataResolvable,
+        );
       }
+
+      client.commands.set(commandName, command);
     }
   }
   client.logs.info(`Loaded ${client.commandArray?.length ?? 0} commands`);
 
   client.on("clientReady", async () => {
     await client.application.commands
-      .set(client.commandArray as any)
+      .set(client.commandArray)
       .catch(console.error);
   });
 }

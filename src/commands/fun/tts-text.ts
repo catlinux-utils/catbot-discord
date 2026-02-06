@@ -1,4 +1,8 @@
-import { SlashCommandBuilder, AttachmentBuilder } from "discord.js";
+import {
+  SlashCommandBuilder,
+  AttachmentBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import { getAllAudioBase64 } from "@sefinek/google-tts-api";
 
 export default {
@@ -10,7 +14,7 @@ export default {
     .addStringOption((option) =>
       option.setName("text").setDescription("Text for say").setRequired(true),
     ),
-  run: async (interaction: any) => {
+  run: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const args = interaction.options.getString("text");
     const audiobase = await getAllAudioBase64(args, {

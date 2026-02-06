@@ -1,4 +1,7 @@
-import { SlashCommandBuilder } from "discord.js";
+import {
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import korwin from "../../json/korwin_quotes.json" with { type: "json" };
 
 export default {
@@ -7,11 +10,12 @@ export default {
     .setDescription("Cytaty Janusza Korwin-Mikkego")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction: any) => {
-    const getRandomElement = (arr: any[]) =>
+  run: async (interaction: ChatInputCommandInteraction) => {
+    const getRandomElement = <T>(arr: T[]) =>
       arr[Math.floor(Math.random() * arr.length)];
 
-    const quote = getRandomElement(korwin.quotes);
+    const data = korwin as { quotes?: string[] };
+    const quote = getRandomElement(data.quotes ?? []);
 
     await interaction.reply(quote);
   },

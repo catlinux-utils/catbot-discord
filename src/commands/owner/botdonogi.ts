@@ -1,4 +1,7 @@
-import { SlashCommandBuilder } from "discord.js";
+import {
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -7,7 +10,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   ownerOnly: true,
-  run: async (interaction: any) => {
+  run: async (interaction: ChatInputCommandInteraction) => {
     await interaction.reply("User bot do usług szefie");
   },
 };

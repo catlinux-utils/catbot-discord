@@ -7,6 +7,7 @@ import type {
   Interaction,
 } from "discord.js";
 import type MusicSystem from "./utils/music-utils/music-system.ts";
+import type { ApplicationCommandDataResolvable } from "discord.js";
 
 // Define logger interface for type safety
 export interface Loggers {
@@ -43,7 +44,7 @@ declare module "discord.js" {
     musicsystem: MusicSystem;
     config: Record<string, unknown>;
     commands: Collection<string, BotCommand>;
-    commandArray?: unknown[];
+    commandArray?: ApplicationCommandDataResolvable[];
     categoriesArray?: string[];
     owners?: string[];
   }

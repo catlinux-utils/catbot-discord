@@ -3,6 +3,8 @@ import {
   EmbedBuilder,
   channelMention,
   MessageFlags,
+  type ChatInputCommandInteraction,
+  type Client,
 } from "discord.js";
 
 export default {
@@ -47,9 +49,9 @@ export default {
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction: any, client: any) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     const subcommand = interaction.options.getSubcommand();
-    const voiceChannel = interaction.member.voice.channel;
+    const voiceChannel = interaction.member?.voice?.channel;
     await interaction.deferReply();
 
     const embed = new EmbedBuilder();

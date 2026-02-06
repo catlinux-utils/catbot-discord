@@ -8,7 +8,7 @@ import {
   AttachmentBuilder,
   Colors,
   MediaGalleryBuilder,
-  type CommandInteraction,
+  type ChatInputCommandInteraction,
 } from "discord.js";
 export default {
   data: new SlashCommandBuilder()
@@ -17,7 +17,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   ownerOnly: true,
-  run: async (interaction: any) => {
+  run: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const container = new ContainerBuilder()
       .setAccentColor(Colors.DarkGold)

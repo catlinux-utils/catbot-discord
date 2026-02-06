@@ -1,4 +1,8 @@
-import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
+import {
+  ContextMenuCommandBuilder,
+  ApplicationCommandType,
+  type UserContextMenuCommandInteraction,
+} from "discord.js";
 import { createGif } from "../../utils/PetPetUtils.ts";
 
 export default {
@@ -7,7 +11,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0])
     .setType(ApplicationCommandType.User),
-  run: async (interaction: any) => {
+  run: async (interaction: UserContextMenuCommandInteraction) => {
     await interaction.deferReply();
     const user = interaction.targetUser;
     const avatar = await user.avatarURL({ extension: "png", size: 1024 });

@@ -3,6 +3,11 @@ import {
   Events,
   PermissionsBitField,
   MessageFlags,
+  type ChatInputCommandInteraction,
+  type Client,
+  type VoiceState,
+  GuildMember,
+  VoiceChannel,
 } from "discord.js";
 import {
   createAudioResource,
@@ -35,7 +40,7 @@ export default {
       option.setName("channel").setDescription("Channel").setRequired(false),
     ),
   ownerOnly: true,
-  run: async (interaction: any, client: any) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     await interaction.deferReply();
 
     const query =
@@ -45,23 +50,23 @@ export default {
 
     const channel =
       interaction.options.getChannel("channel") ||
-      interaction.member.voice.channel;
+      (interaction.member && (interaction.member as GuildMember).voice.channel);
 
     if (!channel && skipChecks !== "true")
-      return interaction.editReply({
+      return interaction.reply({
         content: "You need to enter channel",
         flags: MessageFlags.Ephemeral,
       });
     if (
-      !channel
+      !(channel as VoiceChannel)
         .permissionsFor(interaction.guild.members.me)
-        .has(
+        .has([
           PermissionsBitField.Flags.Connect,
           PermissionsBitField.Flags.Speak,
-        ) &&
+        ]) &&
       skipChecks !== "true"
     )
-      return interaction.editReply({
+      return interaction.reply({
         content: "I don't have permission to talk in this voice channel",
         flags: MessageFlags.Ephemeral,
       });
@@ -80,27 +85,34 @@ export default {
     const resource = createAudioResource(query, { inlineVolume: true });
     await musicplayer.play(resource);
 
-    client.on(Events.VoiceStateUpdate, async (oldState: any, newState: any) => {
-      const oldChannel = oldState.channel;
-      const newChannel = newState.channel;
+    const handler = (oldState: VoiceState, newState: VoiceState) => {
+      const oldVoice = oldState.channel as VoiceChannel | null;
+      const newVoice = newState.channel as VoiceChannel | null;
+      const connectedChannelId = connection.joinConfig.channelId;
 
+      // Ignore events not related to our connected channel
       if (
-        oldChannel?.id &&
-        newChannel?.id &&
-        oldChannel?.id !== newChannel?.id
-      ) {
-        const chan = client.channels.cache.get(oldChannel.id);
+        oldVoice?.id !== connectedChannelId &&
+        newVoice?.id !== connectedChannelId
+      )
+        return;
 
-        if (chan && chan.members.size === 1) {
-          musicplayer.stop();
-        }
-      } else if (oldChannel && !newChannel) {
-        const channelMembers = oldChannel.members.size;
-        if (channelMembers === 1) {
-          musicplayer.stop();
-        }
+      // Determine the relevant channel to inspect (the one we were in)
+      const relevant =
+        oldVoice?.id === connectedChannelId ? oldVoice : newVoice;
+      if (!relevant) return;
+
+      const botId = client.user?.id;
+      if (!botId) return;
+
+      // If bot is the only member left in the channel, stop and remove listener
+      if (relevant.members.has(botId) && relevant.members.size === 1) {
+        musicplayer.stop();
+        client.off(Events.VoiceStateUpdate, handler);
       }
-    });
+    };
+
+    client.on(Events.VoiceStateUpdate, handler);
 
     musicplayer.on(AudioPlayerStatus.Idle, () => {
       connection.destroy();

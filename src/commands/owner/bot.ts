@@ -1,4 +1,9 @@
-import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  type ChatInputCommandInteraction,
+  type Client,
+} from "discord.js";
 import os from "node:os";
 
 export default {
@@ -24,7 +29,7 @@ export default {
         ),
     ),
   ownerOnly: true,
-  run: async (interaction: any, client: any) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
     const subcommandGroup = interaction.options.getSubcommandGroup();
@@ -33,13 +38,13 @@ export default {
         switch (subcommand) {
           case "uptime": {
             let totalSecs = client.uptime / 1000;
-            let days = Math.floor(totalSecs / 86400);
+            const days = Math.floor(totalSecs / 86400);
             totalSecs %= 86400;
-            let hrs = Math.floor(totalSecs / 3600);
+            const hrs = Math.floor(totalSecs / 3600);
             totalSecs %= 3600;
-            let mins = Math.floor(totalSecs / 60);
-            let seconds = Math.floor(totalSecs % 60);
-            let uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
+            const mins = Math.floor(totalSecs / 60);
+            const seconds = Math.floor(totalSecs % 60);
+            const uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
             const embed = new EmbedBuilder()
               .setTitle("Bot Uptime:")
               .setDescription(uptime)
@@ -55,13 +60,13 @@ export default {
       }
       case "system": {
         let totalSecs = os.uptime();
-        let days = Math.floor(totalSecs / 86400);
+        const days = Math.floor(totalSecs / 86400);
         totalSecs %= 86400;
-        let hrs = Math.floor(totalSecs / 3600);
+        const hrs = Math.floor(totalSecs / 3600);
         totalSecs %= 3600;
-        let mins = Math.floor(totalSecs / 60);
-        let seconds = Math.floor(totalSecs % 60);
-        let uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
+        const mins = Math.floor(totalSecs / 60);
+        const seconds = Math.floor(totalSecs % 60);
+        const uptime = `**${days}**d **${hrs}**h **${mins}**m **${seconds}**s`;
         const embed = new EmbedBuilder()
           .setTitle("System Uptime:")
           .setDescription(uptime)

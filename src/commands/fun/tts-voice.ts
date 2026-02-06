@@ -1,4 +1,9 @@
-import { SlashCommandBuilder, type Client } from "discord.js";
+import {
+  GuildMember,
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction,
+  type Client,
+} from "discord.js";
 
 import { getAudioBase64 } from "@sefinek/google-tts-api";
 
@@ -19,11 +24,11 @@ export default {
     .addStringOption((option) =>
       option.setName("text").setDescription("Text for say").setRequired(true),
     ),
-  run: async (interaction: any, client: Client) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     await interaction.deferReply();
     const args = interaction.options.getString("text");
 
-    const voiceChannel = interaction.member?.voice?.channel;
+    const voiceChannel = (interaction.member as GuildMember).voice?.channel;
     if (!voiceChannel) return;
 
     try {

@@ -4,6 +4,8 @@ import {
   ButtonStyle,
   ActionRowBuilder,
   ComponentType,
+  type ChatInputCommandInteraction,
+  type ButtonInteraction,
 } from "discord.js";
 import { Client as YouTubeClient } from "youtubei";
 
@@ -21,7 +23,7 @@ export default {
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction: any) => {
+  run: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     let length = 0;
     const emoji = await interaction.client.application.emojis.fetch(
@@ -53,7 +55,7 @@ export default {
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 300_000,
-      filter: (i: any) => i.user.id === interaction.user.id,
+      filter: (i: ButtonInteraction) => i.user.id === interaction.user.id,
     });
     collector.on("end", async () => {
       row.components.forEach((button: ButtonBuilder) =>
@@ -62,7 +64,7 @@ export default {
       if (!(await interaction.fetchReply().catch(() => false))) return;
       await interaction.editReply({ components: [row] });
     });
-    collector.on("collect", async (response: any) => {
+    collector.on("collect", async (response: ButtonInteraction) => {
       if (response.customId === "next") {
         await response.deferUpdate();
         length++;

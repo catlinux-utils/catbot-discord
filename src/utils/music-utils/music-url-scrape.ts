@@ -28,7 +28,7 @@ export async function getYouTubeStreamUrl(videoUrl: string): Promise<string> {
           new Error("Unsupported host; only youtube.com / youtu.be allowed"),
         );
       }
-    } catch (err) {
+    } catch {
       return reject(new Error("Invalid URL provided"));
     }
 

@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, Collection, Options } from "discord.js";
+import type { BotCommand } from "./types.d.ts";
 import fs from "node:fs";
 import MusicSystem from "./utils/music-utils/music-system.ts";
 import logger from "./utils/logging.ts";
@@ -30,7 +31,7 @@ client.logs = logger;
 
 client.musicsystem = new MusicSystem(client);
 
-client.commands = new Collection<string, any>();
+client.commands = new Collection<string, BotCommand>();
 
 fs.readdirSync(`${process.cwd()}/src/functions`).forEach(async (handler) => {
   await import(`${process.cwd()}/src/functions/${handler}`).then((module) => {

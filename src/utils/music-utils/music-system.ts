@@ -18,7 +18,6 @@ import {
   CommandInteraction,
   MessageFlags,
 } from "discord.js";
-import ffmpeg from "fluent-ffmpeg";
 import { getYouTubeInfo } from "./yt-dlp-info.ts";
 
 interface Song {

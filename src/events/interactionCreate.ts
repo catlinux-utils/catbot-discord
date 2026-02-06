@@ -1,5 +1,4 @@
 import { MessageFlags, type Client } from "discord.js";
-import type { BotCommand } from "../types.d.ts";
 
 export default function interactionCreate(client: Client) {
   client.on("interactionCreate", async (interaction) => {
@@ -38,7 +37,7 @@ export default function interactionCreate(client: Client) {
       }
       try {
         await Promise.resolve(command.run(interaction, client)).catch(
-          (error: any) => {
+          (error: unknown) => {
             console.error(error);
           },
         );
@@ -54,7 +53,7 @@ export default function interactionCreate(client: Client) {
       const command = client.commands.get(interaction.commandName);
       if (!command) return;
       try {
-        await command.autocomplete?.(interaction, client as any);
+        await command.autocomplete?.(interaction, client);
       } catch (error) {
         console.error(error);
       }

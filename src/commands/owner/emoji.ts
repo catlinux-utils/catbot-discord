@@ -1,4 +1,10 @@
-import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from "discord.js";
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlags,
+  type ChatInputCommandInteraction,
+  type Client,
+} from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -46,15 +52,15 @@ export default {
         ),
     ),
   ownerOnly: true,
-  run: async (interaction: any, client: any) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
 
     switch (subcommand) {
       case "list": {
         const emojis = await client.application.emojis.fetch();
-        let list: any[] = [];
-        emojis.forEach((emoji: any) => {
+        const list: { name: string; value: string; inline?: boolean }[] = [];
+        emojis.forEach((emoji) => {
           const data = {
             name: emoji.toString(),
             value: `${emoji.name}:${emoji.id}`,
@@ -66,7 +72,7 @@ export default {
           .setTitle("Emoji list")
           .setFields(list)
           .setColor("Random");
-        return await interaction.editReply({
+        return await interaction.reply({
           embeds: [embed],
           flags: MessageFlags.Ephemeral,
         });
@@ -75,40 +81,34 @@ export default {
         const name = interaction.options.getString("name");
         const image = interaction.options.getAttachment("image");
         if (!image.contentType.startsWith("image")) {
-          return await interaction.editReply({
+          return await interaction.reply({
             content: "The file must be an image",
             flags: MessageFlags.Ephemeral,
           });
         }
 
-        const emoji = await client.application.emojis
-          .create({
-            attachment: image.url,
-            name: name,
-          })
-          .catch(console.error);
-        return await interaction.editReply(
+        const emoji = await client.application.emojis.create({
+          attachment: image.url,
+          name: name,
+        });
+        return await interaction.reply(
           `Emoji ${emoji.toString()} has been created`,
         );
       }
       case "remove": {
         const id = interaction.options.getString("id");
-        const emoji = await client.application.emojis
-          .fetch(id)
-          .catch(console.error);
+        const emoji = await client.application.emojis.fetch(id);
         emoji.delete();
-        return await interaction.editReply(
+        return await interaction.reply(
           `Emoji ${emoji.toString()} has been deleted`,
         );
       }
       case "edit": {
         const id = interaction.options.getString("id");
         const name = interaction.options.getString("name");
-        const emoji = await client.application.emojis
-          .fetch(id)
-          .catch(console.error);
+        const emoji = await client.application.emojis.fetch(id);
         emoji.edit({ name: name });
-        return await interaction.editReply(
+        return await interaction.reply(
           `Emoji ${emoji.toString()} has been edited`,
         );
       }

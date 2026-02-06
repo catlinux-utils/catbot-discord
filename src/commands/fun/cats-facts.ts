@@ -1,4 +1,8 @@
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import {
+  EmbedBuilder,
+  SlashCommandBuilder,
+  type ChatInputCommandInteraction,
+} from "discord.js";
 import axios from "axios";
 export default {
   data: new SlashCommandBuilder()
@@ -6,7 +10,7 @@ export default {
     .setDescription("Cats facts.")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction: any) => {
+  run: async (interaction: ChatInputCommandInteraction) => {
     await interaction.deferReply();
     const response = await axios.get("https://catfact.ninja/fact");
     const responseData = response.data.fact;

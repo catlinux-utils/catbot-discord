@@ -7,7 +7,7 @@ interface LoggerConfig {
 }
 
 interface Logger {
-  (message: string, ...args: any[]): void;
+  (message: string, ...args: unknown[]): void;
 }
 
 interface Loggers {
@@ -19,7 +19,7 @@ interface Loggers {
 }
 
 const createLogger = ({ color, prefix }: LoggerConfig): Logger => {
-  return (message: string, ...args: any[]) => {
+  return (message: string, ...args: unknown[]) => {
     const date = new Date().toLocaleTimeString("en-US", { hour12: false });
     console.log(`${date} ${chalk[color](`${prefix} `)}${message}`, ...args);
   };

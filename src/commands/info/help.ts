@@ -4,6 +4,10 @@ import {
   StringSelectMenuBuilder,
   ActionRowBuilder,
   ComponentType,
+  type ChatInputCommandInteraction,
+  type Client,
+  type StringSelectMenuInteraction,
+  ButtonBuilder,
 } from "discord.js";
 
 export default {
@@ -12,32 +16,37 @@ export default {
     .setDescription("Help command")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction: any, client: any) => {
+  run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     await interaction.deferReply();
 
     function catCom(category: string) {
-      let list: any[] = [];
-      for (const command of client.commands) {
-        if (command[1].category !== category) continue;
-        if (command[1].data.options?.[0]) {
-          const allTier1 = client.application.commands.cache
-            .find((com: any) => com.name === command[1].data.name)
-            .options.every((element: any) => element.type === 1);
+      const list: { name: string; value: string; inline?: boolean }[] = [];
+      for (const [, command] of client.commands) {
+        if (command.category !== category) continue;
+        const data = command.data as {
+          name?: string;
+          options?: { name: string; description?: string }[];
+          description?: string;
+        };
+        if (data.options?.[0]) {
+          const appCommand = client.application.commands.cache.find(
+            (com) => com.name === data.name,
+          );
+          const allTier1 =
+            appCommand?.options?.every((element) => element.type === 1) ??
+            false;
 
-          command[1].data.options.forEach((element: any) => {
-            if (
-              client.application.commands.cache
-                .find((com: any) => com.name === command[1].data.name)
-                .options.find((opt: any) => (opt.name = element.name)).type !==
-              1
-            )
-              return;
-            let data = {
-              name: `</${command[1].data.name} ${element.name}:${client.application.commands.cache.find((com: any) => com.name === command[1].data.name).id}>`,
+          data.options.forEach((element) => {
+            const cmdOption = appCommand?.options.find(
+              (opt) => opt.name === element.name,
+            );
+            if (!cmdOption || cmdOption.type !== 1) return;
+            const item = {
+              name: `</${data.name} ${element.name}:${appCommand?.id}>`,
               value: element.description || "---",
               inline: true,
             };
-            list.push(data);
+            list.push(item);
           });
 
           if (allTier1) {
@@ -45,18 +54,17 @@ export default {
           }
         }
 
-        let data: any = {};
-        data = {
-          name: `</${command[1].data.name}:${client.application.commands.cache.find((com: any) => com.name === command[1].data.name).id}>`,
-          value: command[1].data.description || "---",
+        const item = {
+          name: `</${data.name}:${client.application.commands.cache.find((com) => com.name === data.name)?.id}>`,
+          value: data.description || "---",
           inline: true,
         };
-        list.push(data);
+        list.push(item);
       }
       return list;
     }
-    let catmenu: any[] = [];
-    client.categoriesArray.forEach((cat: string) => {
+    const catmenu: { label: string; description: string; value: string }[] = [];
+    client.categoriesArray?.forEach((cat) => {
       if (cat == "context-menu") return;
       return catmenu.push({
         label: cat,
@@ -64,8 +72,8 @@ export default {
         value: cat,
       });
     });
-    let catfield: any[] = [];
-    client.categoriesArray.forEach((cat: string) => {
+    const catfield: { name: string; value: string; inline?: boolean }[] = [];
+    client.categoriesArray?.forEach((cat) => {
       if (cat == "context-menu") return;
       return catfield.push({
         name: cat,
@@ -87,19 +95,21 @@ export default {
       embeds: [catembed],
       components: [row],
     });
-
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.StringSelect,
       time: 300_000,
-      filter: (i: any) => i.user.id === interaction.user.id,
+      filter: (i: StringSelectMenuInteraction) =>
+        i.user.id === interaction.user.id,
     });
     collector.on("end", async () => {
-      row.components.forEach((comp: any) => comp.setDisabled(true));
+      row.components.forEach((comp) =>
+        (comp as ButtonBuilder).setDisabled(true),
+      );
       if (!(await interaction.fetchReply().catch(() => false))) return;
       await interaction.editReply({ components: [row] });
     });
 
-    collector.on("collect", async (response: any) => {
+    collector.on("collect", async (response: StringSelectMenuInteraction) => {
       await response.deferUpdate();
       const fieds = catCom(response.values[0]);
 
