@@ -35,7 +35,7 @@ export default {
       option.setName("channel").setDescription("Channel").setRequired(false),
     ),
   ownerOnly: true,
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: any) => {
     await interaction.deferReply();
 
     const query =
@@ -44,8 +44,7 @@ export default {
     const skipChecks = interaction.options.getString("skip-checks");
 
     const channel =
-      interaction.options.getChannel("channel") ||
-      interaction.member.voice.channel;
+      interaction.options.getChannel("channel") || interaction.member.voice.channel;
 
     if (!channel && skipChecks !== "true")
       return interaction.editReply({
@@ -55,10 +54,7 @@ export default {
     if (
       !channel
         .permissionsFor(interaction.guild.members.me)
-        .has(
-          PermissionsBitField.Flags.Connect,
-          PermissionsBitField.Flags.Speak,
-        ) &&
+        .has(PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak) &&
       skipChecks !== "true"
     )
       return interaction.editReply({
@@ -67,7 +63,7 @@ export default {
       });
     const musicplayer = createAudioPlayer({
       behaviors: {
-        noSubscriber: NoSubscriberBehavior.Idle,
+        noSubscriber: NoSubscriberBehavior.Stop,
       },
     });
 
@@ -78,10 +74,9 @@ export default {
     });
     connection.subscribe(musicplayer);
     const resource = createAudioResource(query, { inlineVolume: true });
-    //resource.volume.setVolume(0.5);
     await musicplayer.play(resource);
 
-    client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+    client.on(Events.VoiceStateUpdate, async (oldState: any, newState: any) => {
       const oldChannel = oldState.channel;
       const newChannel = newState.channel;
 

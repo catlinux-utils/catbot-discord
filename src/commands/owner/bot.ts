@@ -24,7 +24,7 @@ export default {
         ),
     ),
   ownerOnly: true,
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: any) => {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
     const subcommandGroup = interaction.options.getSubcommandGroup();

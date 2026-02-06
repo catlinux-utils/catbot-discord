@@ -46,17 +46,16 @@ export default {
         ),
     ),
   ownerOnly: true,
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: any) => {
     await interaction.deferReply();
     const subcommand = interaction.options.getSubcommand();
 
     switch (subcommand) {
       case "list": {
         const emojis = await client.application.emojis.fetch();
-        let list = [];
-        emojis.forEach((emoji) => {
-          let data = new Object();
-          data = {
+        let list: any[] = [];
+        emojis.forEach((emoji: any) => {
+          const data = {
             name: emoji.toString(),
             value: `${emoji.name}:${emoji.id}`,
             inline: true,
@@ -94,24 +93,16 @@ export default {
       }
       case "remove": {
         const id = interaction.options.getString("id");
-        const emoji = await client.application.emojis
-          .fetch(id)
-          .catch(console.error);
+        const emoji = await client.application.emojis.fetch(id).catch(console.error);
         emoji.delete();
-        return await interaction.editReply(
-          `Emoji ${emoji.toString()} has been deleted`,
-        );
+        return await interaction.editReply(`Emoji ${emoji.toString()} has been deleted`);
       }
       case "edit": {
         const id = interaction.options.getString("id");
         const name = interaction.options.getString("name");
-        const emoji = await client.application.emojis
-          .fetch(id)
-          .catch(console.error);
+        const emoji = await client.application.emojis.fetch(id).catch(console.error);
         emoji.edit({ name: name });
-        return await interaction.editReply(
-          `Emoji ${emoji.toString()} has been edited`,
-        );
+        return await interaction.editReply(`Emoji ${emoji.toString()} has been edited`);
       }
     }
   },

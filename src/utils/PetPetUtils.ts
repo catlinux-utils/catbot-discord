@@ -24,7 +24,7 @@ const getFrames = (() => {
   };
 })();
 
-export const createGif = async (profileImage: string, delay = 20) => {
+export const createGif = async (profileImage: string, delay:number = 20) => {
   const frames = await getFrames();
   const gif = new GIFEncoder(128, 128);
 

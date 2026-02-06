@@ -6,7 +6,7 @@ export default {
     .setDescription("Cats facts.")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction) => {
+  run: async (interaction: any) => {
     await interaction.deferReply();
     const response = await axios.get("https://catfact.ninja/fact");
     const responseData = response.data.fact;

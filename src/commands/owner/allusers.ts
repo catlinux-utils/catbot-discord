@@ -7,10 +7,10 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   ownerOnly: true,
-  run: async (interaction) => {
+  run: async (interaction: any) => {
     await interaction.deferReply();
     let userlist = "Users:\n";
-    interaction.client.users.cache.forEach((user) => {
+    interaction.client.users.cache.forEach((user: any) => {
       userlist += ` - ${user.username} (${user.id})\n`;
     });
     await interaction.editReply({

@@ -12,11 +12,11 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0])
     .setType(ApplicationCommandType.User),
-  run: async (interaction) => {
+  run: async (interaction: any) => {
     await interaction.deferReply();
     const user = interaction.targetUser;
     const member = interaction.options.get("user");
-    let field = [];
+    let field: any[] = [];
     if (member.member?.nick) {
       field.push({
         name: "**Server Name:**",

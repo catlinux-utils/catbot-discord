@@ -7,10 +7,10 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   ownerOnly: true,
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: any) => {
     await interaction.deferReply();
     let list = "Guilds:\n";
-    client.guilds.cache.forEach((guild) => {
+    client.guilds.cache.forEach((guild: any) => {
       list += ` - ${guild.name} (${guild.id}) - ${guild.memberCount} Members - Owner: ${guild.ownerId}\n`;
     });
 

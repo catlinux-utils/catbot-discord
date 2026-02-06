@@ -7,9 +7,8 @@ export default {
     .setDescription("Cytaty Janusza Korwin-Mikkego")
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction) => {
-    const getRandomElement = (arr) =>
-      arr[Math.floor(Math.random() * arr.length)];
+  run: async (interaction: any) => {
+    const getRandomElement = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
 
     const quote = getRandomElement(korwin.quotes);
 
