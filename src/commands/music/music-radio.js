@@ -1,4 +1,9 @@
-import { SlashCommandBuilder, Events, PermissionsBitField } from "discord.js";
+import {
+  SlashCommandBuilder,
+  Events,
+  PermissionsBitField,
+  MessageFlags,
+} from "discord.js";
 import {
   createAudioResource,
   joinVoiceChannel,
