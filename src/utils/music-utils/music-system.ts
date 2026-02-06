@@ -1,4 +1,4 @@
-import { getYouTubeStreamUrl } from "./music-url-scrape.js";
+import { getYouTubeStreamUrl } from "./music-url-scrape.ts";
 import {
   createAudioResource,
   joinVoiceChannel,
@@ -17,9 +17,8 @@ import {
   VoiceChannel,
   CommandInteraction,
 } from "discord.js";
-//import { MusicClient, Client as YoutubeClient } from "youtubei";
 import ffmpeg from "fluent-ffmpeg";
-import { getYouTubeInfo } from "./music-utils/yt-dlp-info.ts";
+import { getYouTubeInfo } from "./yt-dlp-info.ts";
 
 interface Song {
   url: string;
@@ -42,6 +41,9 @@ interface Queue {
 class MusicSystem {
   private queue: Map<string, Queue>;
   private client: Client;
+  private readonly MAX_PLAYLIST_ITEMS = 50;
+  private readonly RETRIES = 2;
+  private readonly BACKOFF_BASE = 500; // ms
 
   constructor(client: Client) {
     this.queue = new Map();
@@ -71,7 +73,7 @@ class MusicSystem {
     }: {
       textChannel: TextChannel;
       interaction?: CommandInteraction;
-    }
+    },
   ): Promise<void> {
     const guildId = voiceChannel.guild.id;
     let songs: Song[] = [];
@@ -82,7 +84,11 @@ class MusicSystem {
     }
 
     try {
-      const info = await getYouTubeInfo(query);
+      const info = await this.retryAsync(
+        () => getYouTubeInfo(query),
+        this.RETRIES,
+        this.BACKOFF_BASE,
+      );
       if (info.playlist_items) {
         info.playlist_items.forEach((data) => {
           songs.push({
@@ -104,12 +110,20 @@ class MusicSystem {
         return;
       }
 
+      // Limit playlist size to avoid abuse
+      if (songs.length > this.MAX_PLAYLIST_ITEMS) {
+        this.client.logs.warn(
+          `Playlist too large (${songs.length}), truncating to ${this.MAX_PLAYLIST_ITEMS}`,
+        );
+        songs = songs.slice(0, this.MAX_PLAYLIST_ITEMS);
+      }
+
       await this.addToQueue(
         guildId,
         voiceChannel,
         textChannel,
         songs,
-        interaction
+        interaction,
       );
     } catch (err) {
       this.client.logs.error("Error processing play request", err);
@@ -122,7 +136,7 @@ class MusicSystem {
     voiceChannel: VoiceChannel,
     textChannel: TextChannel,
     songs: Song[],
-    interaction?: CommandInteraction
+    interaction?: CommandInteraction,
   ): Promise<void> {
     let serverQueue = this.queue.get(guildId);
 
@@ -139,7 +153,7 @@ class MusicSystem {
   private createQueue(
     voiceChannel: VoiceChannel,
     textChannel: TextChannel,
-    songs: Song[]
+    songs: Song[],
   ): Queue {
     return {
       textChannel,
@@ -184,19 +198,15 @@ class MusicSystem {
 
   private async playSong(song: Song, queue: Queue): Promise<void> {
     try {
-      const streamUrl = await getYouTubeStreamUrl(song.url);
+      const streamUrl = await this.retryAsync(
+        () => getYouTubeStreamUrl(song.url),
+        this.RETRIES,
+        this.BACKOFF_BASE,
+      );
       if (!streamUrl) {
         await this.handleSongError(queue, "Failed to get stream URL");
         return;
       }
-      // Create an FFmpeg stream using fluent-ffmpeg
-      // const ffmpegStream = ffmpeg(streamUrl)
-      //   .audioCodec("libopus")
-      //   .format("opus")
-      //   .audioChannels(2)
-      //   .audioFrequency(48000)
-      //   .outputOptions(["-analyzeduration", "0", "-loglevel", "verbose"])
-      //   .pipe();
 
       const resource = createAudioResource(streamUrl, {
         inlineVolume: true,
@@ -206,7 +216,7 @@ class MusicSystem {
       queue.player.play(resource);
 
       queue.player.once(AudioPlayerStatus.Idle, () =>
-        this.handleSongEnd(queue)
+        this.handleSongEnd(queue),
       );
       queue.player.on("error", (error) => {
         this.client.logs.error("Player error", error);
@@ -216,6 +226,28 @@ class MusicSystem {
       this.client.logs.error("Error playing song", err);
       await this.handleSongError(queue, "Failed to play song");
     }
+  }
+
+  private async retryAsync<T>(
+    fn: () => Promise<T>,
+    retries = 2,
+    backoffBase = 500,
+  ): Promise<T> {
+    let attempt = 0;
+    let lastError: any;
+    while (attempt <= retries) {
+      try {
+        if (attempt > 0) this.client.logs.info(`Retry attempt ${attempt}`);
+        return await fn();
+      } catch (err) {
+        lastError = err;
+        attempt += 1;
+        if (attempt > retries) break;
+        const wait = backoffBase * Math.pow(2, attempt - 1);
+        await new Promise((res) => setTimeout(res, wait));
+      }
+    }
+    throw lastError;
   }
 
   private async handleSongEnd(queue: Queue): Promise<void> {
@@ -241,7 +273,7 @@ class MusicSystem {
 
   private async handleSongError(
     queue: Queue,
-    errorMessage: string
+    errorMessage: string,
   ): Promise<void> {
     await queue.textChannel.send(errorMessage);
     queue.songs.shift();
@@ -256,14 +288,14 @@ class MusicSystem {
   private async sendSongAddedEmbed(
     queue: Queue,
     songs: Song[],
-    interaction?: CommandInteraction
+    interaction?: CommandInteraction,
   ): Promise<void> {
     const embed = new EmbedBuilder()
       .setTitle(songs.length > 1 ? "Added Playlist to Queue" : "Added to Queue")
       .setDescription(
         songs.length > 1
           ? `Added ${songs.length} songs from playlist`
-          : `**${songs[0].title || songs[0].url}**`
+          : `**${songs[0].title || songs[0].url}**`,
       )
       .setColor("Blue");
 
@@ -282,7 +314,7 @@ class MusicSystem {
           song.duration
             ? `\nDuration: ${this.formatDuration(song.duration)}`
             : ""
-        }`
+        }`,
       )
       .setColor("Blue");
 
@@ -291,7 +323,7 @@ class MusicSystem {
 
   private async sendError(
     interaction: CommandInteraction | undefined,
-    message: string
+    message: string,
   ): Promise<void> {
     const serverQueue = interaction?.guild?.id
       ? this.queue.get(interaction.guild.id)
@@ -469,9 +501,9 @@ class MusicSystem {
             (song, index) =>
               `${index + 1}. ${song.title || song.url}${
                 song.duration ? ` (${this.formatDuration(song.duration)})` : ""
-              }`
+              }`,
           )
-          .join("\n")
+          .join("\n"),
       )
       .setColor("Blue");
 
@@ -498,7 +530,7 @@ class MusicSystem {
 
     serverQueue.loop = !serverQueue.loop;
     await interaction.editReply(
-      `Loop ${serverQueue.loop ? "enabled" : "disabled"}`
+      `Loop ${serverQueue.loop ? "enabled" : "disabled"}`,
     );
   }
 }

@@ -1,5 +1,5 @@
 import { Collection } from "discord.js";
-import MusicSystem from "./utils/music-system.ts";
+import MusicSystem from "./utils/music-utils/music-system.ts";
 
 // Define logger interface for type safety
 interface Loggers {

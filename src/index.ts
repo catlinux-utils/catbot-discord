@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits, Collection, Options } from "discord.js";
 import fs from "node:fs";
-import MusicSystem from "./utils/music-system.ts";
+import MusicSystem from "./utils/music-utils/music-system.ts";
 import logger from "./utils/logging.ts";
 
 import "dotenv/config";
