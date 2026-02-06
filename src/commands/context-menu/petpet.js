@@ -1,5 +1,5 @@
 import { ContextMenuCommandBuilder, ApplicationCommandType } from "discord.js";
-import { createGif } from "../../utils/PetPetUtils.js";
+import { createGif } from "../../utils/PetPetUtils.ts";
 
 export default {
   data: new ContextMenuCommandBuilder()

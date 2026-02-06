@@ -1,7 +1,8 @@
 import fs from "node:fs";
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, type Client } from "discord.js";
+import type { BotCommand } from "../types.d.ts";
 
-export default async (client) => {
+export default async function handelCommands(client: Client): Promise<void> {
   client.commandArray = [];
   client.categoriesArray = [];
   const commandFolders = fs.readdirSync(`${process.cwd()}/src/commands`);
@@ -11,23 +12,27 @@ export default async (client) => {
       .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
     client.categoriesArray.push(folder);
     for (const file of commandFiles) {
-      const command = await import(
-        `${process.cwd()}/src/commands/${folder}/${file}`
+      const command = (
+        await import(`${process.cwd()}/src/commands/${folder}/${file}`)
+      ).default as unknown as BotCommand;
+      command.category = folder;
+      // store typed command
+      client.commands.set(
+        (command as any).data?.name ?? file.replace(/\.[jt]s$/, ""),
+        command,
       );
-      command.default.category = folder;
-      client.commands.set(command.default.data.name, command.default);
-      if (command.default.data instanceof SlashCommandBuilder) {
-        client.commandArray.push(command.default.data.toJSON());
+      if (command.data instanceof SlashCommandBuilder) {
+        client.commandArray.push((command.data as any).toJSON());
       } else {
-        client.commandArray.push(command.default.data);
+        client.commandArray.push(command.data as any);
       }
     }
   }
-  client.logs.info(`Loaded ${client.commandArray.length} commands`);
+  client.logs.info(`Loaded ${client.commandArray?.length ?? 0} commands`);
 
   client.on("clientReady", async () => {
     await client.application.commands
-      .set(client.commandArray)
+      .set(client.commandArray as any)
       .catch(console.error);
   });
-};
+}

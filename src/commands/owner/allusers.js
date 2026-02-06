@@ -13,6 +13,9 @@ export default {
     interaction.client.users.cache.forEach((user) => {
       userlist += ` - ${user.username} (${user.id})\n`;
     });
-    await interaction.editReply({ content: userlist, ephemeral: true });
+    await interaction.editReply({
+      content: userlist,
+      flags: MessageFlags.Ephemeral,
+    });
   },
 };

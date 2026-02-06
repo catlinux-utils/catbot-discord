@@ -1,13 +1,13 @@
-//source: https://github.com/tairasoul/petpet-bot/blob/main/src/utils.ts - MIT Licence
+// source: https://github.com/tairasoul/petpet-bot/blob/main/src/utils.ts - MIT Licence
 
 import { createCanvas, loadImage } from "canvas";
 
 import pkg from "gifenc";
-const { GIFEncoder, quantize, applyPalette } = pkg;
+const { GIFEncoder, quantize, applyPalette } = pkg as any;
 
 const getFrames = (() => {
   let tries = 0;
-  let cache;
+  let cache: any;
   return async () => {
     if (!cache && tries++ < 5) {
       cache = await Promise.all(
@@ -24,7 +24,7 @@ const getFrames = (() => {
   };
 })();
 
-export const createGif = async (profileImage, delay = 20) => {
+export const createGif = async (profileImage: string, delay = 20) => {
   const frames = await getFrames();
   const gif = new GIFEncoder(128, 128);
 

@@ -14,6 +14,9 @@ export default {
       list += ` - ${guild.name} (${guild.id}) - ${guild.memberCount} Members - Owner: ${guild.ownerId}\n`;
     });
 
-    await interaction.editReply({ content: list, ephemeral: true });
+    await interaction.editReply({
+      content: list,
+      flags: MessageFlags.Ephemeral,
+    });
   },
 };

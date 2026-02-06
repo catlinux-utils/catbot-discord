@@ -69,7 +69,7 @@ export default {
           .setColor("Random");
         return await interaction.editReply({
           embeds: [embed],
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
       case "add": {
@@ -78,7 +78,7 @@ export default {
         if (!image.contentType.startsWith("image")) {
           return await interaction.editReply({
             content: "The file must be an image",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           });
         }
 

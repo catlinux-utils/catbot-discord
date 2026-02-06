@@ -45,7 +45,7 @@ export default {
     if (!channel && skipChecks !== "true")
       return interaction.editReply({
         content: "You need to enter channel",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     if (
       !channel
@@ -58,7 +58,7 @@ export default {
     )
       return interaction.editReply({
         content: "I don't have permission to talk in this voice channel",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     const musicplayer = createAudioPlayer({
       behaviors: {

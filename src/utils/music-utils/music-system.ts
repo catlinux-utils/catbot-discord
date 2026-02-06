@@ -16,6 +16,7 @@ import {
   TextChannel,
   VoiceChannel,
   CommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import ffmpeg from "fluent-ffmpeg";
 import { getYouTubeInfo } from "./yt-dlp-info.ts";
@@ -329,7 +330,10 @@ class MusicSystem {
       ? this.queue.get(interaction.guild.id)
       : undefined;
     if (interaction) {
-      await interaction.followUp({ content: message, ephemeral: true });
+      await interaction.followUp({
+        content: message,
+        flags: MessageFlags.Ephemeral,
+      });
     } else if (serverQueue) {
       await serverQueue.textChannel.send(message);
     }
@@ -389,7 +393,7 @@ class MusicSystem {
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command must be used in a server!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -417,7 +421,7 @@ class MusicSystem {
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command must be used in a server!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -426,7 +430,7 @@ class MusicSystem {
     if (!serverQueue) {
       await interaction.reply({
         content: "No queue to resume!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -434,7 +438,7 @@ class MusicSystem {
     if (serverQueue.player.state.status === AudioPlayerStatus.Playing) {
       await interaction.reply({
         content: "The player is already playing!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -447,7 +451,7 @@ class MusicSystem {
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command must be used in a server!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -455,7 +459,7 @@ class MusicSystem {
     if (volume < 0 || volume > 10) {
       await interaction.reply({
         content: "Volume must be between 0 and 10",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -479,7 +483,7 @@ class MusicSystem {
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command must be used in a server!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -488,7 +492,7 @@ class MusicSystem {
     if (!serverQueue || serverQueue.songs.length === 0) {
       await interaction.reply({
         content: "The queue is empty!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -514,7 +518,7 @@ class MusicSystem {
     if (!interaction.guild) {
       await interaction.reply({
         content: "This command must be used in a server!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -523,7 +527,7 @@ class MusicSystem {
     if (!serverQueue) {
       await interaction.reply({
         content: "No queue to loop!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }

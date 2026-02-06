@@ -10,7 +10,7 @@ export default {
     .addStringOption((option) =>
       option.setName("text").setDescription("Text for say").setRequired(true),
     ),
-  run: async (interaction) => {
+  run: async (interaction: any) => {
     await interaction.deferReply();
     const args = interaction.options.getString("text");
     const audiobase = await getAllAudioBase64(args, {

@@ -8,12 +8,14 @@ import {
 } from "@discordjs/voice";
 
 import { PassThrough } from "node:stream";
+import type { Readable } from "node:stream";
+import type { Client } from "discord.js";
 
-export default (client) => {
+export default function ttsAi(client: Client) {
   client.on("messageCreate", async (message) => {
     if (message.author.bot || !message.content.startsWith("?ait ")) return;
 
-    if (!client.owners.includes(message.member.id)) return;
+    if (!client.owners?.includes(message.member.id)) return;
 
     const args = message.content.slice("?ait ".length).trim();
     if (!args) return;
@@ -60,7 +62,7 @@ export default (client) => {
       audioStream.end(combinedBuffer);
 
       const player = createAudioPlayer();
-      const resource = createAudioResource(audioStream);
+      const resource = createAudioResource(audioStream as unknown as Readable);
       player.play(resource);
       connection.subscribe(player);
 
@@ -72,4 +74,4 @@ export default (client) => {
       client.logs.error("Error:", error);
     }
   });
-};
+}

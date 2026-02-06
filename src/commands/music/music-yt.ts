@@ -1,4 +1,9 @@
-import { SlashCommandBuilder, EmbedBuilder, channelMention } from "discord.js";
+import {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  channelMention,
+  MessageFlags,
+} from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,7 +47,7 @@ export default {
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: any) => {
     const subcommand = interaction.options.getSubcommand();
     const voiceChannel = interaction.member.voice.channel;
     await interaction.deferReply();
@@ -51,7 +56,10 @@ export default {
 
     if (!voiceChannel) {
       embed.setColor("Red").setDescription("You must be in a vc");
-      return interaction.editReply({ embeds: [embed], ephemeral: true });
+      return interaction.editReply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     if (
@@ -65,7 +73,10 @@ export default {
             interaction.guild.members.me.voice.channel.id,
           )}`,
         );
-      return interaction.editReply({ embeds: [embed], ephemeral: true });
+      return interaction.editReply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     try {
@@ -114,7 +125,10 @@ export default {
     } catch (err) {
       console.log(err);
       embed.setColor("Red").setDescription("Something went wrong...");
-      return interaction.editReply({ embeds: [embed], ephemeral: true });
+      return interaction.editReply({
+        embeds: [embed],
+        flags: MessageFlags.Ephemeral,
+      });
     }
   },
 };

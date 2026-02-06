@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, type Client } from "discord.js";
 
 import { getAudioBase64 } from "@sefinek/google-tts-api";
 
@@ -19,7 +19,7 @@ export default {
     .addStringOption((option) =>
       option.setName("text").setDescription("Text for say").setRequired(true),
     ),
-  run: async (interaction, client) => {
+  run: async (interaction: any, client: Client) => {
     await interaction.deferReply();
     const args = interaction.options.getString("text");
 
