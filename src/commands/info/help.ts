@@ -28,7 +28,8 @@ export default {
             if (
               client.application.commands.cache
                 .find((com: any) => com.name === command[1].data.name)
-                .options.find((opt: any) => (opt.name = element.name)).type !== 1
+                .options.find((opt: any) => (opt.name = element.name)).type !==
+              1
             )
               return;
             let data = {
@@ -72,11 +73,20 @@ export default {
         inline: true,
       });
     });
-    const catSelect = new StringSelectMenuBuilder().setCustomId("starter").setPlaceholder("Make a selection!").setOptions(catmenu);
+    const catSelect = new StringSelectMenuBuilder()
+      .setCustomId("starter")
+      .setPlaceholder("Make a selection!")
+      .setOptions(catmenu);
     const row = new ActionRowBuilder().addComponents(catSelect);
-    const catembed = new EmbedBuilder().setTitle("Help - Categories:").setFields(catfield).setColor("Random");
+    const catembed = new EmbedBuilder()
+      .setTitle("Help - Categories:")
+      .setFields(catfield)
+      .setColor("Random");
 
-    const message = await interaction.editReply({ embeds: [catembed], components: [row] });
+    const message = await interaction.editReply({
+      embeds: [catembed],
+      components: [row],
+    });
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.StringSelect,
@@ -94,7 +104,9 @@ export default {
       const fieds = catCom(response.values[0]);
 
       const comembed = new EmbedBuilder()
-        .setTitle(`Help - ${response.values[0].charAt(0).toUpperCase() + response.values[0].slice(1)} category`)
+        .setTitle(
+          `Help - ${response.values[0].charAt(0).toUpperCase() + response.values[0].slice(1)} category`,
+        )
         .setFields(fieds)
         .setColor("Random");
       response.editReply({ embeds: [comembed] });

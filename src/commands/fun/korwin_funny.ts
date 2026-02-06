@@ -8,7 +8,8 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction: any) => {
-    const getRandomElement = (arr: any[]) => arr[Math.floor(Math.random() * arr.length)];
+    const getRandomElement = (arr: any[]) =>
+      arr[Math.floor(Math.random() * arr.length)];
 
     const parts = ["1", "2", "3", "4", "5", "6"].map((key) =>
       getRandomElement((korwin as any)[key]),

@@ -44,7 +44,8 @@ export default {
     const skipChecks = interaction.options.getString("skip-checks");
 
     const channel =
-      interaction.options.getChannel("channel") || interaction.member.voice.channel;
+      interaction.options.getChannel("channel") ||
+      interaction.member.voice.channel;
 
     if (!channel && skipChecks !== "true")
       return interaction.editReply({
@@ -54,7 +55,10 @@ export default {
     if (
       !channel
         .permissionsFor(interaction.guild.members.me)
-        .has(PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak) &&
+        .has(
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.Speak,
+        ) &&
       skipChecks !== "true"
     )
       return interaction.editReply({

@@ -14,22 +14,36 @@ export default {
     .setName("youtube")
     .setDescription("YouTube search")
     .addStringOption((option) =>
-      option.setName("query").setDescription("Query to search").setRequired(true),
+      option
+        .setName("query")
+        .setDescription("Query to search")
+        .setRequired(true),
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
   run: async (interaction: any) => {
     await interaction.deferReply();
     let length = 0;
-    const emoji = await interaction.client.application.emojis.fetch("1298353951426482249");
+    const emoji = await interaction.client.application.emojis.fetch(
+      "1298353951426482249",
+    );
 
     const query = interaction.options.getString("query");
     const videos = await youtube.search(query, { type: "video" });
     length++;
-    const nextButton = new ButtonBuilder().setCustomId("next").setLabel("Next").setStyle(ButtonStyle.Primary);
-    const prevButton = new ButtonBuilder().setCustomId("prev").setLabel("Previous").setStyle(ButtonStyle.Primary).setDisabled(true);
+    const nextButton = new ButtonBuilder()
+      .setCustomId("next")
+      .setLabel("Next")
+      .setStyle(ButtonStyle.Primary);
+    const prevButton = new ButtonBuilder()
+      .setCustomId("prev")
+      .setLabel("Previous")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true);
 
-    const row = new ActionRowBuilder().addComponents(prevButton).addComponents(nextButton);
+    const row = new ActionRowBuilder()
+      .addComponents(prevButton)
+      .addComponents(nextButton);
 
     const message = await interaction.editReply({
       content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\nhttps://www.youtube.com/watch?v=${videos.items[0].id}`,
@@ -42,7 +56,9 @@ export default {
       filter: (i: any) => i.user.id === interaction.user.id,
     });
     collector.on("end", async () => {
-      row.components.forEach((button:ButtonBuilder) => button.setDisabled(true));
+      row.components.forEach((button: ButtonBuilder) =>
+        button.setDisabled(true),
+      );
       if (!(await interaction.fetchReply().catch(() => false))) return;
       await interaction.editReply({ components: [row] });
     });

@@ -93,16 +93,24 @@ export default {
       }
       case "remove": {
         const id = interaction.options.getString("id");
-        const emoji = await client.application.emojis.fetch(id).catch(console.error);
+        const emoji = await client.application.emojis
+          .fetch(id)
+          .catch(console.error);
         emoji.delete();
-        return await interaction.editReply(`Emoji ${emoji.toString()} has been deleted`);
+        return await interaction.editReply(
+          `Emoji ${emoji.toString()} has been deleted`,
+        );
       }
       case "edit": {
         const id = interaction.options.getString("id");
         const name = interaction.options.getString("name");
-        const emoji = await client.application.emojis.fetch(id).catch(console.error);
+        const emoji = await client.application.emojis
+          .fetch(id)
+          .catch(console.error);
         emoji.edit({ name: name });
-        return await interaction.editReply(`Emoji ${emoji.toString()} has been edited`);
+        return await interaction.editReply(
+          `Emoji ${emoji.toString()} has been edited`,
+        );
       }
     }
   },
