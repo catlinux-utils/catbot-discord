@@ -12,7 +12,7 @@ export default {
       arr[Math.floor(Math.random() * arr.length)];
 
     const parts = ["1", "2", "3", "4", "5", "6"].map((key) =>
-      getRandomElement(korwin[key])
+      getRandomElement(korwin[key]),
     );
 
     const quote = parts.join(" ");

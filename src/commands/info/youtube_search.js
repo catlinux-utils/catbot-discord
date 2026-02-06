@@ -17,7 +17,7 @@ export default {
       option
         .setName("query")
         .setDescription("Query to search")
-        .setRequired(true)
+        .setRequired(true),
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
@@ -25,7 +25,7 @@ export default {
     await interaction.deferReply();
     let length = 0;
     const emoji = await interaction.client.application.emojis.fetch(
-      "1298353951426482249"
+      "1298353951426482249",
     );
 
     const query = interaction.options.getString("query");

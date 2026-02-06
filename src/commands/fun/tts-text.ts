@@ -8,7 +8,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2])
     .addStringOption((option) =>
-      option.setName("text").setDescription("Text for say").setRequired(true)
+      option.setName("text").setDescription("Text for say").setRequired(true),
     ),
   run: async (interaction) => {
     await interaction.deferReply();
@@ -20,7 +20,7 @@ export default {
       timeout: 10000,
     });
     const audioBuffers = audiobase.map((base64) =>
-      Buffer.from(base64.base64, "base64")
+      Buffer.from(base64.base64, "base64"),
     );
     const combinedBuffer = Buffer.concat(audioBuffers);
 

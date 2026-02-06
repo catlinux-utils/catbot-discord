@@ -16,13 +16,13 @@ export default {
     await interaction.deferReply();
     const user = interaction.targetUser;
     const member = interaction.options.get("user");
-    let field = []
+    let field = [];
     if (member.member?.nick) {
       field.push({
         name: "**Server Name:**",
         value: `\`\`\`${member.member.nick}\`\`\``,
         inline: false,
-      })
+      });
     }
     field.push(
       {
@@ -44,7 +44,8 @@ export default {
         name: "**Joined Server On:**",
         value: `${time(new Date(member.member.joined_at), TimestampStyles.LongDate)}`,
         inline: true,
-      })
+      },
+    );
 
     const info = new EmbedBuilder()
       .setTitle(`${user.username}'s Info`)

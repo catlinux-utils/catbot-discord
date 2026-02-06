@@ -13,9 +13,9 @@ const getFrames = (() => {
       cache = await Promise.all(
         Array.from({ length: 10 }, (_, i) =>
           loadImage(
-            `https://raw.githubusercontent.com/VenPlugs/petpet/main/frames/pet${i}.gif`
-          )
-        )
+            `https://raw.githubusercontent.com/VenPlugs/petpet/main/frames/pet${i}.gif`,
+          ),
+        ),
       );
       if (!cache && tries === 5)
         console.error("Lazy factory failed:", getFrames);
@@ -47,7 +47,7 @@ export const createGif = async (profileImage, delay = 20) => {
       offsetX * 128,
       offsetY * 128,
       width * 128,
-      height * 128
+      height * 128,
     );
     ctx.drawImage(frames[i], 0, 0, 128, 128);
 

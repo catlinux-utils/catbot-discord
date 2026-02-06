@@ -17,7 +17,7 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2])
     .addStringOption((option) =>
-      option.setName("text").setDescription("Text for say").setRequired(true)
+      option.setName("text").setDescription("Text for say").setRequired(true),
     ),
   run: async (interaction, client) => {
     await interaction.deferReply();

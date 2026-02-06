@@ -34,7 +34,7 @@ export default {
             let data = {
               name: `</${command[1].data.name} ${element.name}:${
                 client.application.commands.cache.find(
-                  (com) => com.name === command[1].data.name
+                  (com) => com.name === command[1].data.name,
                 ).id
               }>`,
               value: element.description || "---",
@@ -52,7 +52,7 @@ export default {
         data = {
           name: `</${command[1].data.name}:${
             client.application.commands.cache.find(
-              (com) => com.name === command[1].data.name
+              (com) => com.name === command[1].data.name,
             ).id
           }>`,
           value: command[1].data.description || "---",
@@ -115,7 +115,7 @@ export default {
           `Help - ${
             response.values[0].charAt(0).toUpperCase() +
             response.values[0].slice(1)
-          } category`
+          } category`,
         )
         .setFields(fieds)
         .setColor("Random");

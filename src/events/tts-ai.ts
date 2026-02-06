@@ -52,7 +52,7 @@ export default (client) => {
       });
 
       const audioBuffers = audiobase.map((base64) =>
-        Buffer.from(base64.base64, "base64")
+        Buffer.from(base64.base64, "base64"),
       );
       const combinedBuffer = Buffer.concat(audioBuffers);
 

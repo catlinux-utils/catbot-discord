@@ -24,33 +24,33 @@ export default {
         actionRow.setComponents(
           new UserSelectMenuBuilder()
             .setCustomId("exampleSelect")
-            .setPlaceholder("Select users")
-        )
+            .setPlaceholder("Select users"),
+        ),
       )
       .addSeparatorComponents((separator) => separator)
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((textDisplay) =>
-            textDisplay.setContent("1")
+            textDisplay.setContent("1"),
           )
           .setButtonAccessory((button) =>
             button
               .setCustomId("start")
               .setLabel("start")
-              .setStyle(ButtonStyle.Primary)
-          )
+              .setStyle(ButtonStyle.Primary),
+          ),
       )
       .addSectionComponents((section) =>
         section
           .addTextDisplayComponents((textDisplay) =>
-            textDisplay.setContent("2")
+            textDisplay.setContent("2"),
           )
           .setButtonAccessory((button) =>
             button
               .setCustomId("stop")
               .setLabel("stop")
-              .setStyle(ButtonStyle.Primary)
-          )
+              .setStyle(ButtonStyle.Primary),
+          ),
       )
       .addFileComponents(new FileBuilder().setURL(`attachment://windows.mp3`))
       .addMediaGalleryComponents(
@@ -58,16 +58,16 @@ export default {
           (mediaGalleryItem) =>
             mediaGalleryItem
               .setDescription(
-                "alt text displaying on an image from the AttachmentBuilder"
+                "alt text displaying on an image from the AttachmentBuilder",
               )
               .setURL("https://i.imgur.com/AfFp7pu.png"),
           (mediaGalleryItem) =>
             mediaGalleryItem
               .setDescription(
-                "alt text displaying on an image from the AttachmentBuilder"
+                "alt text displaying on an image from the AttachmentBuilder",
               )
-              .setURL("https://i.imgur.com/AfFp7pu.png")
-        )
+              .setURL("https://i.imgur.com/AfFp7pu.png"),
+        ),
       );
     const file = new AttachmentBuilder("src/resources/windows.mp3");
 

@@ -12,20 +12,20 @@ export default {
           option
             .setName("query")
             .setDescription("Provide name of the song")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("stop").setDescription("Stop song")
+      subcommand.setName("stop").setDescription("Stop song"),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("pause").setDescription("Pause song")
+      subcommand.setName("pause").setDescription("Pause song"),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("resume").setDescription("Resume song")
+      subcommand.setName("resume").setDescription("Resume song"),
     )
     .addSubcommand((subcommand) =>
-      subcommand.setName("skip").setDescription("Skip song")
+      subcommand.setName("skip").setDescription("Skip song"),
     )
     .addSubcommand((subcommand) =>
       subcommand
@@ -37,8 +37,8 @@ export default {
             .setDescription("Volume level (0-10)")
             .setRequired(true)
             .setMinValue(0)
-            .setMaxValue(10)
-        )
+            .setMaxValue(10),
+        ),
     )
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2]),
@@ -62,8 +62,8 @@ export default {
         .setColor("Red")
         .setDescription(
           `You can't use the music system as it's already active in ${channelMention(
-            interaction.guild.members.me.voice.channel.id
-          )}`
+            interaction.guild.members.me.voice.channel.id,
+          )}`,
         );
       return interaction.editReply({ embeds: [embed], ephemeral: true });
     }

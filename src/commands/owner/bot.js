@@ -12,16 +12,16 @@ export default {
         .setName("info")
         .setDescription("Show bot info")
         .addSubcommand((subcommand) =>
-          subcommand.setName("uptime").setDescription("Show bot uptime")
-        )
+          subcommand.setName("uptime").setDescription("Show bot uptime"),
+        ),
     )
     .addSubcommandGroup((subcommandgroup) =>
       subcommandgroup
         .setName("system")
         .setDescription("Show system info")
         .addSubcommand((subcommand) =>
-          subcommand.setName("uptime").setDescription("Show system uptime")
-        )
+          subcommand.setName("uptime").setDescription("Show system uptime"),
+        ),
     ),
   ownerOnly: true,
   run: async (interaction, client) => {

@@ -7,43 +7,43 @@ export default {
     .setIntegrationTypes([0, 1])
     .setContexts([0, 1, 2])
     .addSubcommand((subcommand) =>
-      subcommand.setName("list").setDescription("List all emoji")
+      subcommand.setName("list").setDescription("List all emoji"),
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add")
         .setDescription("Add emoji")
         .addStringOption((option) =>
-          option.setName("name").setDescription("Emoji name").setRequired(true)
+          option.setName("name").setDescription("Emoji name").setRequired(true),
         )
         .addAttachmentOption((option) =>
           option
             .setName("image")
             .setDescription("Emoji image")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("remove")
         .setDescription("Remove emoji")
         .addStringOption((option) =>
-          option.setName("id").setDescription("Emoji id").setRequired(true)
-        )
+          option.setName("id").setDescription("Emoji id").setRequired(true),
+        ),
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("edit")
         .setDescription("Edit emoji")
         .addStringOption((option) =>
-          option.setName("id").setDescription("Emoji id").setRequired(true)
+          option.setName("id").setDescription("Emoji id").setRequired(true),
         )
         .addStringOption((option) =>
           option
             .setName("name")
             .setDescription("New emoji name")
-            .setRequired(true)
-        )
+            .setRequired(true),
+        ),
     ),
   ownerOnly: true,
   run: async (interaction, client) => {
@@ -89,7 +89,7 @@ export default {
           })
           .catch(console.error);
         return await interaction.editReply(
-          `Emoji ${emoji.toString()} has been created`
+          `Emoji ${emoji.toString()} has been created`,
         );
       }
       case "remove": {
@@ -99,7 +99,7 @@ export default {
           .catch(console.error);
         emoji.delete();
         return await interaction.editReply(
-          `Emoji ${emoji.toString()} has been deleted`
+          `Emoji ${emoji.toString()} has been deleted`,
         );
       }
       case "edit": {
@@ -110,7 +110,7 @@ export default {
           .catch(console.error);
         emoji.edit({ name: name });
         return await interaction.editReply(
-          `Emoji ${emoji.toString()} has been edited`
+          `Emoji ${emoji.toString()} has been edited`,
         );
       }
     }

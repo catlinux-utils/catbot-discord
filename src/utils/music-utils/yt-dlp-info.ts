@@ -50,7 +50,7 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeInfo> {
 
     if (!stdout || stderr.includes("ERROR")) {
       throw new Error(
-        `yt-dlp metadata error: ${stderr || "No output received"}`
+        `yt-dlp metadata error: ${stderr || "No output received"}`,
       );
     }
 
