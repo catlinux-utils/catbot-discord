@@ -6,7 +6,7 @@
   "type": "module",
   "types": "./src/index.d.ts",
   "scripts": {
-    "start": "node ./src/index.ts",
+    "start": "node ./src/index.ts --trace-deprecation",
     "lint": "eslint ./src --ext .ts,.js",
     "lint:fix": "eslint --fix ./src --ext .ts,.js",
     "format": "prettier --write .",
