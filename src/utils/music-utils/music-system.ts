@@ -17,6 +17,7 @@ import {
   VoiceChannel,
   CommandInteraction,
   MessageFlags,
+  type GuildTextBasedChannel,
 } from "discord.js";
 import { getYouTubeInfo } from "./yt-dlp-info.ts";
 
@@ -27,7 +28,7 @@ interface Song {
 }
 
 interface Queue {
-  textChannel: TextChannel;
+  textChannel: GuildTextBasedChannel;
   voiceChannel: VoiceChannel;
   connection: VoiceConnection | null;
   songs: Song[];
@@ -71,7 +72,7 @@ class MusicSystem {
       textChannel,
       interaction,
     }: {
-      textChannel: TextChannel;
+      textChannel: GuildTextBasedChannel;
       interaction?: CommandInteraction;
     },
   ): Promise<void> {
@@ -134,7 +135,7 @@ class MusicSystem {
   private async addToQueue(
     guildId: string,
     voiceChannel: VoiceChannel,
-    textChannel: TextChannel,
+    textChannel: GuildTextBasedChannel,
     songs: Song[],
     interaction?: CommandInteraction,
   ): Promise<void> {
@@ -152,7 +153,7 @@ class MusicSystem {
 
   private createQueue(
     voiceChannel: VoiceChannel,
-    textChannel: TextChannel,
+    textChannel: GuildTextBasedChannel,
     songs: Song[],
   ): Queue {
     return {

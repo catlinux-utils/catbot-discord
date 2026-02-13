@@ -58,14 +58,14 @@ export default {
 
     if (!voiceChannel) {
       embed.setColor("Red").setDescription("You must be in a vc");
-      return interaction.editReply({
+      return interaction.reply({
         embeds: [embed],
         flags: MessageFlags.Ephemeral,
       });
     }
 
     if (
-      !interaction.member.voice.channel.id ==
+      interaction.member.voice?.channel.id ==
       interaction.guild.members.me.voice.channel?.id
     ) {
       embed
@@ -75,7 +75,7 @@ export default {
             interaction.guild.members.me.voice.channel.id,
           )}`,
         );
-      return interaction.editReply({
+      return interaction.reply({
         embeds: [embed],
         flags: MessageFlags.Ephemeral,
       });
@@ -127,7 +127,7 @@ export default {
     } catch (err) {
       console.log(err);
       embed.setColor("Red").setDescription("Something went wrong...");
-      return interaction.editReply({
+      return interaction.reply({
         embeds: [embed],
         flags: MessageFlags.Ephemeral,
       });
