@@ -84,7 +84,7 @@ export default {
           prevButton.setDisabled(true);
         }
         response.editReply({
-          content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\nhttps://www.youtube.com/watch?v=${videos.items[0].id}`,
+          content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\nhttps://www.youtube.com/watch?v=${videos.items[length - 1].id}`,
           components: [row],
         });
       }
