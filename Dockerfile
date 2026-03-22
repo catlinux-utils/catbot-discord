@@ -1,10 +1,11 @@
-FROM node:alpine
+FROM node:22-alpine
 
 RUN mkdir -p /usr/src/bot
 WORKDIR /usr/src/bot
 
 RUN apk update && \
     apk add --no-cache \
+    build-base \
     make \
     g++ \
     python3 \
@@ -14,6 +15,7 @@ RUN apk update && \
     pixman-dev \
     cairo-dev \
     pango-dev \
+    librsvg-dev \
     libjpeg-turbo-dev \
     giflib-dev
 
