@@ -5,6 +5,8 @@ import {
   MessageFlags,
   type ChatInputCommandInteraction,
   type Client,
+  type GuildMember,
+  type VoiceChannel,
 } from "discord.js";
 
 export default {
@@ -51,7 +53,7 @@ export default {
     .setContexts([0, 1, 2]),
   run: async (interaction: ChatInputCommandInteraction, client: Client) => {
     const subcommand = interaction.options.getSubcommand();
-    const voiceChannel = interaction.member?.voice?.channel;
+    const voiceChannel = (interaction.member as GuildMember).voice?.channel;
     await interaction.deferReply();
 
     const embed = new EmbedBuilder();
@@ -65,7 +67,7 @@ export default {
     }
 
     if (
-      interaction.member.voice?.channel.id ==
+      (interaction.member as GuildMember).voice?.channel.id ==
       interaction.guild.members.me.voice.channel?.id
     ) {
       embed
@@ -75,7 +77,7 @@ export default {
             interaction.guild.members.me.voice.channel.id,
           )}`,
         );
-      return interaction.reply({
+      return interaction.followUp({
         embeds: [embed],
         flags: MessageFlags.Ephemeral,
       });
@@ -88,9 +90,13 @@ export default {
           await interaction.editReply({
             content: "🎶 Request received.",
           });
-          return await client.musicsystem.play(voiceChannel, query, {
-            textChannel: interaction.channel,
-          });
+          return await client.musicsystem.play(
+            voiceChannel as VoiceChannel,
+            query,
+            {
+              textChannel: interaction.channel,
+            },
+          );
         }
         case "stop": {
           await interaction.editReply({

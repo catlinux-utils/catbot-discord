@@ -49,7 +49,7 @@ export default {
 
     const message = await interaction.editReply({
       content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\nhttps://www.youtube.com/watch?v=${videos.items[0].id}`,
-      components: [row],
+      components: [row.toJSON()],
     });
 
     const collector = message.createMessageComponentCollector({
@@ -62,7 +62,7 @@ export default {
         button.setDisabled(true),
       );
       if (!(await interaction.fetchReply().catch(() => false))) return;
-      await interaction.editReply({ components: [row] });
+      await interaction.editReply({ components: [row.toJSON()] });
     });
     collector.on("collect", async (response: ButtonInteraction) => {
       if (response.customId === "next") {
@@ -74,7 +74,7 @@ export default {
         }
         response.editReply({
           content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\n https://www.youtube.com/watch?v=${videos.items[length - 1].id}`,
-          components: [row],
+          components: [row.toJSON()],
         });
       } else if (response.customId === "prev") {
         await response.deferUpdate();
@@ -85,7 +85,7 @@ export default {
         }
         response.editReply({
           content: `${emoji.toString()} [${length}/${videos.items.length}] Search: ${query}\nhttps://www.youtube.com/watch?v=${videos.items[length - 1].id}`,
-          components: [row],
+          components: [row.toJSON()],
         });
       }
     });
