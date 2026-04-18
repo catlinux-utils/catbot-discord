@@ -67,8 +67,9 @@ export default {
     }
 
     if (
-      (interaction.member as GuildMember).voice?.channel.id ==
-      interaction.guild.members.me.voice.channel?.id
+      (interaction.member as GuildMember).voice?.channel.id !==
+        interaction.guild.members.me.voice.channel?.id &&
+      interaction.guild.members.me?.voice.channel
     ) {
       embed
         .setColor("Red")
