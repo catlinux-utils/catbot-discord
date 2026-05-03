@@ -24,7 +24,7 @@ export default {
     ),
   ownerOnly: true,
   run: async (interaction: ChatInputCommandInteraction) => {
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply(/*{ flags: MessageFlags.Ephemeral }*/);
 
     const prompt = interaction.options.getString("text")!;
     const limit = interaction.options.getInteger("limit") ?? 10;
