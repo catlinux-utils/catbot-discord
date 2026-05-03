@@ -1,7 +1,7 @@
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { promisify } from "util";
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 interface PlaylistItem {
   title: string;
@@ -45,8 +45,8 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeInfo> {
 
     const hasVideo = urlObj.searchParams.has("v");
 
-    const command = `yt-dlp --playlist-items 1:20 --simulate --no-warnings --skip-download --flat-playlist --dump-single-json "${url}"`;
-    const { stdout, stderr } = await execAsync(command);
+    const args = ["--playlist-items", "1:20", "--simulate", "--no-warnings", "--skip-download", "--flat-playlist", "--dump-single-json", url];
+    const { stdout, stderr } = await execFileAsync("yt-dlp", args);
 
     if (!stdout || stderr.includes("ERROR")) {
       throw new Error(
