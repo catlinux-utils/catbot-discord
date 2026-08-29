@@ -45,7 +45,16 @@ export async function getYouTubeInfo(url: string): Promise<YouTubeInfo> {
 
     const hasVideo = urlObj.searchParams.has("v");
 
-    const args = ["--playlist-items", "1:20", "--simulate", "--no-warnings", "--skip-download", "--flat-playlist", "--dump-single-json", url];
+    const args = [
+      "--playlist-items",
+      "1:20",
+      "--simulate",
+      "--no-warnings",
+      "--skip-download",
+      "--flat-playlist",
+      "--dump-single-json",
+      url,
+    ];
     const { stdout, stderr } = await execFileAsync("yt-dlp", args);
 
     if (!stdout || stderr.includes("ERROR")) {

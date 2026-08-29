@@ -205,7 +205,10 @@ export default {
           console.log(`Started recording ${userName} to ${mp3Path}`);
         });
 
-        const voiceStateHandler = (oldState: VoiceState, newState: VoiceState) => {
+        const voiceStateHandler = (
+          oldState: VoiceState,
+          newState: VoiceState,
+        ) => {
           if (newState.member?.id === client.user?.id) {
             if (!newState.channelId) {
               stopRecording(guildId);
