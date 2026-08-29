@@ -129,8 +129,10 @@ Przed commitem **zawsze**: `npm run format && npm run lint && npm run type-check
 Projekt używa [Conventional Commits](https://www.conventionalcommits.org/). Schemat:
 
 ```
-<type>(<scope>)?: <krótki opis po polsku lub angielsku>
+<type>(<scope>)?: <short description in English>
 ```
+
+**Commit messages must be in English** — both the subject line and the body. User-facing strings in code (bot replies, embeds) stay in Polish; only commit metadata is English.
 
 Dozwolone typy:
 
@@ -147,14 +149,14 @@ Dozwolone typy:
 
 Przykłady:
 
-- `feat: komenda /manifesto z formatowaniem Discorda`
-- `fix(manifesto): parser nie łapał zagnieżdżonych klamer w body`
-- `refactor(utils/manifesto): inline'uj splitFirstHeading do buildEmbed`
-- `docs: sekcja 'Styl helperów' w AGENTS.md`
+- `feat: add /manifesto command with Discord markdown`
+- `fix(manifesto): parser missed nested braces in body`
+- `refactor(utils/manifesto): inline splitFirstHeading into buildEmbed`
+- `docs: add 'Helper style' section to AGENTS.md`
 
 Opcjonalne **scope** w nawiasach to kategoria lub nazwa pliku (np. `manifesto`, `skynet`, `interactionCreate`). Dla commitów obejmujących wiele plików — bez scope.
 
-Stopka zawsze kończy się 🐱 (tradycja projektu). Np.: `feat: komenda /parasocial 🐱`.
+Stopka zawsze kończy się 🐱 (tradycja projektu). Np.: `feat: add /parasocial command 🐱`.
 
 ## 6. Workflow dla agenta — checklist
 
