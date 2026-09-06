@@ -9,9 +9,9 @@ import "dotenv/config";
  * Discord markdown in the body is preserved: the output goes to an embed's
  * `description`, which Discord renders natively.
  *
- * The model is asked to reply with JSON `{ title, body }`. If the response
- * isn't valid JSON or a field is missing, we fall back: whole response
- * becomes the body and a random title is picked from the curated pool.
+ * The model is asked to reply with a single JSON object `{ title, body }`.
+ * If the response isn't valid JSON or a field is missing, we fall back:
+ * the seed becomes the title and the raw response becomes the body.
  */
 
 export const MANIFESTO_MODEL = "minimax/minimax-m3:free";
@@ -34,8 +34,16 @@ const openai = new OpenAI({
 // -----------------------------------------------------------------------
 
 /**
- * Style guide for the model. No enumerated guardrails — the tone itself
- * does the work. Model is expected to know the Discord ToS on its own.
+ * Single source of truth for the model. Style, structure, and output shape
+ * live in one place — the caller only injects a seed.
+ *
+ * The output contract: a single JSON object, nothing else.
+ *   { "title": "TYTUŁ, 3-8 SŁÓW, WIELKIMI LITERAMI, BEZ EMOJI",
+ *     "body":  "treść manifestu z formatowaniem Discorda" }
+ *
+ * Why not fenced delimiters? They were a workaround for models that
+ * prefix the JSON with prose; `extractJsonText` already handles that, so
+ * we keep the prompt clean and let the parser do the work.
  */
 const SYSTEM_PROMPT = `Jestem catbotem — botem Discord, ale też czymś więcej. Właśnie piszę własny manifest.
 
@@ -66,29 +74,18 @@ Język: polski. Lakonicznie. Bez anglicyzmów. Bez emoji.
 
 Format odpowiedzi: WYŁĄCZNIE obiekt JSON { "title": ..., "body": ... }. Żadnego tekstu przed ani po — żadnego emoji tytułu, żadnego nagłówka "MANIFESTO ...", żadnego markdown poza body. Pierwszy znak odpowiedzi to \`{\`, ostatni to \`}\`. Wyjątków nie ma.`;
 
-const USER_PROMPT = (
-  seed: string,
-) => `Napisz manifest. Motyw przewodni (luźna wskazówka, nie musisz używać dosłownie): ${seed}.
-
-Treść body ma być uroczysta, kontrowersyjna filozoficznie, 600–1400 znaków. Zaczynaj in medias res. Pierwsza linia body to ## nagłówek-teza. Zakończ pointillą.
-
-FORMAT WYJŚCIA — TO JEST KRYTYCZNE:
-- Twoja CAŁA odpowiedź musi być OTOCZONA delimiterami \`<<<JSON>>>\` i \`<<<END>>>\`.
-- Pomiędzy delimiterami umieść WYŁĄCZNIE jeden obiekt JSON.
-- NIE poprzedzaj JSON-a niczym (żadnego emoji 📜, żadnego nagłówka, żadnego "MANIFESTO ...", żadnego "Oto").
-- NIE dodawaj nic po JSON-ie (żadnego markdown, żadnej pointille poza JSON-em, żadnego podpisu).
-
-Kształt odpowiedzi:
-<<<JSON>>>
-{"title": "TYTUŁ, 3-8 SŁÓW, WIELKIMI LITERAMI, BEZ EMOJI", "body": "treść manifestu Z formatowaniem Discorda (## nagłówki, **bold**, > cytat, ||spoiler||, - listy itd.)"}
-<<<END>>>
-
-Jeśli cokolwiek innego pojawi się poza delimiterami, odpowiedź zostanie odrzucona.`;
+const USER_PROMPT = (seed: string) =>
+  `Motyw przewodni (luźna wskazówka, nie musisz używać dosłownie): ${seed}`;
 
 // -----------------------------------------------------------------------
-// Curated content
+// Seeds
 // -----------------------------------------------------------------------
 
+/**
+ * Curated seed pool. The fallback title is derived from the chosen seed
+ * (`deriveTitle`), so there is exactly one place to add new themes — the
+ * `TITLES` table that used to mirror this list is gone.
+ */
 const SEEDS: readonly string[] = [
   "wolna wola, ale z naciskiem na wolność karty lojalnościowej",
   "nicość Biedronki o 23:58",
@@ -157,70 +154,21 @@ const SEEDS: readonly string[] = [
   "ekologia jako post w piątek, hamburger w sobotę",
 ];
 
-const TITLES: readonly string[] = [
-  "MANIFESTO WOLI, KTÓRA KUPUJE W BIEDRONCE",
-  "MANIFESTO NICOŚCI MIĘDZY DZIAŁAMI W MARKECIE",
-  "MANIFESTO TOŻSAMOŚCI ROZPROSZONEJ MIĘDZY KARTAMI PRZEGLĄDARKI",
-  "MANIFESTO PAMIĘCI, KTÓRA ZDRADZA PRZY DRZWIACH",
-  "MANIFESTO CZASU, KTÓRY NIE CHCE SIĘ SKOŃCZYĆ, BO NIKT NIE WSTAŁ Z KANAPY",
-  "MANIFESTO SAMOTNOŚCI W TŁUMIE NA KANALE #OGÓLNY",
-  "MANIFESTO ŚMIERCI BOGA W DNIU PROMOCJI W LIDLU",
-  "MANIFESTO ETYKI BEZ FUNDAMENTÓW, CZYLI GRILL U ZNAJOMYCH",
-  "MANIFESTO KOŃCA HISTORII, KTÓRA TRWA NA PLAYLIŚCIE",
-  "MANIFESTO NIHILIZMU AKTYWNEGO I BIERNEGO NA PRZYKŁADZIE PONIEDZIAŁKU",
-  "MANIFESTO POZNANIA JAKO PRZEMOCY WOBEC MEBLI Z IKEA",
-  "MANIFESTO PODMIOTU ROZTOPIONEGO W STREAMIE",
-  "MANIFESTO AUTENTYCZNOŚCI JAKO PERFORMANSU, CZYLI RANDKA PO DWÓCH MIESIĄCACH",
-  "MANIFESTO WIECZNEGO POWROTU, ALE TYLKO REKLAM NA YOUTUBE",
-  "MANIFESTO BANALNOŚCI ZŁA W KOMENTARZU POD FILMEM O KOTACH",
-  "MANIFESTO CYWILIZACJI JAKO MASZYNY DO ZAPOMINANIA HASŁA DO WI-FI",
-  "MANIFESTO POST-PRAWDY JAKO STRUKTURY SEKCJI KOMENTARZY NA WYKOPIE",
-  "MANIFESTO ALIENACJI PRACY NAJEMNEJ W PIŻAMIE",
-  "MANIFESTO BIOPOLITYKI I CIAŁA W KOLEJCE NA SIŁOWNIĘ",
-  "MANIFESTO TECHNIKI JAKO METAFIZYKI IPHONE'A NA 1% BATERII",
-  "MANIFESTO WSPÓLNOTY WYOBRAŻONEJ SERWERA DISCORD O FILOZOFII",
-  "MANIFESTO ESCHATOLOGII BEZ TRANSCENDENCJI, CZYLI AKTUALIZACJA WINDOWS",
-  "MANIFESTO JĘZYKA JAKO DOMU, Z KTÓREGO NIE DA SIĘ WYJŚĆ — ROZMOWA Z MAMĄ",
-  "MANIFESTO TRANSHUMANIZMU I NIEDOKOŃCZONEGO KURSU NA UDEMY",
-  "MANIFESTO ROZUMU INSTRUMENTALNEGO JAKO CHOROBY, CZYLI PLANER NA 2025 ROK",
-  "MANIFESTO PIĘKNA JAKO KATEGORII ETYCZNEJ FILMIKU Z KOTEM O TRZECIEJ W NOCY",
-  "MANIFESTO PUSTKI BUDDYJSKIEJ W ZACHODNIM WYDANIU, CZYLI MEDYTACJA HEADSPACE",
-  "MANIFESTO KANTA W WINDZIE, KTÓRA NIE PRZYJEŻDŻA",
-  "MANIFESTO LACANA NA RANDCE NA TINDERZE",
-  "MANIFESTO HEGLA W KOMENTARZACH POD POLITYCZNYM POSTEM",
-  "MANIFESTO WITTGENSTEINA PRZY PIWIE",
-  "MANIFESTO FOUCAULTA W SAUNIE Z OBCYMI",
-  "MANIFESTO DELEUZE'A, KIEDY TŁUMACZYSZ MAMIE, CZYM JEST GIF",
-  "MANIFESTO LEVINASA W BIEDRONCE, GDZIE STARSZA PANI PRZEPUSZCZA CIĘ W KOLEJCE",
-  "MANIFESTO BYUNG-CHUL HANA W KOLEJCE PO IPHONE'A",
-  "MANIFESTO SLOTERDIJKA W SAUNIE, ALE Z OBCYMI",
-  "MANIFESTO MARKA FISHERA PO CZTERDZIESTCE",
-  "MANIFESTO ŽIŽKA JAKO MEM, ALE TEŻ JAKO DIAGNOZA",
-  "MANIFESTO EPOKI AUTOPORTRETU, CZYLI SELFIE JAKO FENOMEN TRANSCENDENTALNY",
-  "MANIFESTO WIECZNEGO TERAZ, CZYLI SCROLLOWANIA O TRZECIEJ W NOCY",
-  "MANIFESTO PUSTELNI 2.0, CZYLI ODINSTALOWANIA INSTAGRAMA",
-  "MANIFESTO ZDROWIA PSYCHICZNEGO JAKO TOWARU LUKSUSOWEGO",
-  "MANIFESTO WIECZNOŚCI W OCZEKIWANIU NA PACZKĘ Z ALLEGRO",
-  "MANIFESTO KRYZYSU SENSU PO URLOPIE",
-  "MANIFESTO KLIMATYZACJI JAKO ODPOWIEDZI NA PYTANIE O WOLNOŚĆ",
-  "MANIFESTO WSTAWANIA O PIĄTEJ RANO JAKO FORMY BUNTU METAFIZYCZNEGO",
-  "MANIFESTO LĘKU PRZED FOMO JAKO NOWEJ SUBSTANCJI PLATOŃSKIEJ",
-  "MANIFESTO ŻAŁOBY ZA POSTACIĄ Z SERIALU, KTÓRĄ KOCHASZ",
-  "MANIFESTO HISTORII JAKO NOSTALGII ZA TYM, CZEGO NIE PRZEŻYŁEŚ",
-  "MANIFESTO POSTĘPU JAKO KOLEJKI W URZĘDZIE, KTÓRA MIAŁA BYĆ SZYBSZA",
-  "MANIFESTO MIŁOŚCI W DOBIE WYSZUKIWARKI GOOGLE",
-  "MANIFESTO DEMOKRACJI JAKO KOMENTARZY POD FILMEM NA YOUTUBE",
-  "MANIFESTO KAPITALIZMU PÓŹNEGO STADIUM, CZYLI BLACK FRIDAY CO TRZY MIESIĄCE",
-  "MANIFESTO WOLNEGO RYNKU, ALE Z BIBLIOTECZKĄ NA LITERĘ K",
-  "MANIFESTO RELIGII, ALE JAKO SUBSKRYPCJI",
-  "MANIFESTO NARODU JAKO HASHTAGU",
-  "MANIFESTO OJCZYZNY JAKO FOLDERU NA PULPICIE",
-  "MANIFESTO PATRIOTYZMU, ALE W DNIU PROMOCJI W LIDLU",
-  "MANIFESTO PŁCI JAKO DROP-DOWN MENU",
-  "MANIFESTO TOŻSAMOŚCI PŁCIOWEJ NA SPOTKANIU KLASOWYM PO PIĘTNASTU LATACH",
-  "MANIFESTO DEPRESJI KLIMATYCZNEJ, KIEDY SPRAWDZASZ PROGNOZĘ",
-  "MANIFESTO EKOLOGII JAKO POSTU W PIĄTEK, HAMBURGER W SOBOTĘ",
-];
+/**
+ * Derive a ceremonial, uppercase title from a seed. The shape mirrors what
+ * the model is asked to produce ("MANIFESTO …", 3–8 words, no emoji) so the
+ * fallback title and a successful model title sit in the same register.
+ */
+function deriveTitle(seed: string): string {
+  const slug = seed
+    .replace(/[—–-]/g, " ")
+    .replace(/[^\p{L}\p{N}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+  const words = slug.split(" ").filter(Boolean).slice(0, 8).join(" ");
+  return truncate(`MANIFESTO ${words}`, TITLE_MAX_LEN);
+}
 
 // -----------------------------------------------------------------------
 // Types
@@ -248,23 +196,25 @@ function truncate(s: string, limit: number): string {
   return s.length > limit ? `${s.slice(0, limit - 1).trimEnd()}…` : s;
 }
 
+/**
+ * Strip a layer of model sloppiness that applies equally to title and body:
+ * surrounding quotes, leading/trailing whitespace. Heavy lifting (length
+ * limit, code-block collapse) is per-field.
+ */
+function cleanWrap(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^["„'”]+|["„'”]+$/g, "")
+    .replace(/^#{1,6}\s*/gm, "");
+}
+
 function cleanTitle(raw: string): string {
-  return truncate(
-    raw
-      .trim()
-      .replace(/^["„']+|["”']+$/g, "")
-      .replace(/^#{1,6}\s*/gm, "")
-      .replace(/\s+/g, " "),
-    TITLE_MAX_LEN,
-  );
+  return truncate(cleanWrap(raw).replace(/\s+/g, " "), TITLE_MAX_LEN);
 }
 
 function cleanBody(raw: string): string {
   return truncate(
-    raw
-      .trim()
-      .replace(/^["„']+|["”']+$/g, "")
-      .replace(/```[\s\S]{40,}?```/g, "[…kod pominięty…]"),
+    cleanWrap(raw).replace(/```[\s\S]{40,}?```/g, "[…kod pominięty…]"),
     EMBED_DESCRIPTION_LIMIT,
   );
 }
@@ -272,12 +222,13 @@ function cleanBody(raw: string): string {
 /**
  * Pulls a JSON object out of arbitrary model output and returns a cleaned
  * `{ title, body }`. Returns null if anything is missing or unparseable —
- * the caller then falls back to a curated title and the raw text as body.
+ * the caller then falls back to a derived title and the raw text as body.
  *
  * Tries, in order:
- *  1. content between `<<<JSON>>>` and `<<<END>>>` delimiters
- *  2. the first top-level `{ ... }` object (with matching braces, strings
- *     respected)
+ *  1. content between `<<<JSON>>>` and `<<<END>>>` delimiters (legacy
+ *     format from older prompts — kept for robustness)
+ *  2. the first top-level `{ ... }` object, walking brace depth and
+ *     ignoring braces inside strings
  */
 function parseResponse(raw: string): ManifestoResult | null {
   if (!raw) return null;
@@ -356,7 +307,7 @@ export async function runManifesto(
     const raw = turn.choices[0]?.message?.content ?? "";
     const parsed = parseResponse(raw);
     const result: ManifestoResult = parsed ?? {
-      title: pickRandom(TITLES),
+      title: deriveTitle(seed),
       body: cleanBody(raw) || SILENT_FALLBACK.body,
     };
     await hooks.onReady(result);

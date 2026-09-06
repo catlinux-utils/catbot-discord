@@ -59,10 +59,6 @@ export default {
   },
 };
 
-// -----------------------------------------------------------------------
-// Embed builder
-// -----------------------------------------------------------------------
-
 function buildEmbed(
   result: { title: string; body: string },
   interaction: ChatInputCommandInteraction,
@@ -71,29 +67,16 @@ function buildEmbed(
   const { user, guild } = interaction;
   const member = guild?.members.cache.get(user.id);
   const avatar = member?.displayAvatarURL({ size: 256, extension: "png" });
-
-  // Body is expected to start with `## …` (per the system prompt). Lift
-  // that first heading into the footer as an italic epigraph so it
-  // doesn't double up with the embed title.
-  const headingMatch = /^#{2,3}\s+(.+)$/m.exec(result.body);
-  const epigraph = headingMatch?.[1].trim() ?? null;
-  const description = headingMatch
-    ? result.body.replace(headingMatch[0], "").trimStart()
-    : result.body;
-
   const guildName = guild?.name ?? "DM";
   const dateTag = `manifest #${new Date().toISOString().slice(0, 10)}`;
-  const footerText = epigraph
-    ? `catbot • ${guildName} • *${epigraph}* • ${dateTag}`
-    : `catbot • ${guildName} • ${dateTag}`;
 
   return new EmbedBuilder()
     .setAuthor({ name: `${user.tag} zaintonował manifest`, iconURL: avatar })
     .setTitle(`📜 ${result.title}`)
-    .setDescription(description)
+    .setDescription(result.body)
     .setColor("Random")
     .setFooter({
-      text: footerText,
+      text: `catbot • ${guildName} • ${dateTag}`,
       iconURL: client.user?.displayAvatarURL() ?? undefined,
     })
     .setTimestamp();
