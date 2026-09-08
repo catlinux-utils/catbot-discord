@@ -30,7 +30,7 @@
           ffmpeg
           glib
           harfbuzz
-
+          whisper-cpp
         ];
 
         shellHook = ''
