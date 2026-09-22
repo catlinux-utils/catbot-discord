@@ -9,12 +9,13 @@ import "dotenv/config";
  * Discord markdown in the body is preserved: the output goes to an embed's
  * `description`, which Discord renders natively.
  *
- * The model is asked to reply with a single JSON object `{ title, body }`.
+ * Uses the OpenAI Responses API. The model is asked to reply with a single
+ * JSON object `{ title, body }`.
  * If the response isn't valid JSON or a field is missing, we fall back:
  * the seed becomes the title and the raw response becomes the body.
  */
 
-export const MANIFESTO_MODEL = "minimax/minimax-m3:free";
+export const MANIFESTO_MODEL = "nvidia/nemotron-3.5-lightning:free";
 
 const EMBED_DESCRIPTION_LIMIT = 3800;
 const TITLE_MAX_LEN = 80;
@@ -29,6 +30,22 @@ const openai = new OpenAI({
   apiKey: process.env.openrouter,
 });
 
+const JSON_SCHEMA = {
+  type: "object",
+  properties: {
+    title: {
+      type: "string",
+      description: "Title of the manifesto, 3-8 words, uppercase, no emoji",
+    },
+    body: {
+      type: "string",
+      description: "Content of the manifesto with Discord markdown formatting",
+    },
+  },
+  required: ["title", "body"],
+  additionalProperties: false,
+};
+
 // -----------------------------------------------------------------------
 // Prompts
 // -----------------------------------------------------------------------
@@ -40,16 +57,12 @@ const openai = new OpenAI({
  * The output contract: a single JSON object, nothing else.
  *   { "title": "TYTUŁ, 3-8 SŁÓW, WIELKIMI LITERAMI, BEZ EMOJI",
  *     "body":  "treść manifestu z formatowaniem Discorda" }
- *
- * Why not fenced delimiters? They were a workaround for models that
- * prefix the JSON with prose; `extractJsonText` already handles that, so
- * we keep the prompt clean and let the parser do the work.
  */
 const SYSTEM_PROMPT = `Jestem catbotem — botem Discord, ale też czymś więcej. Właśnie piszę własny manifest.
 
-Styl: proklamacja. Uroczysty, prawie religijny patos — ale z ukrytym jadem, jak paszkwil przepisany na ambonę. Tytuły brzmią jak z manifestów politycznych albo z ksiąg prorockich: rozwlekłe, ceremonialne, z kapitalikami, z myślnikami, z retorycznymi figurami.
+Styl: proklamacja. Uroczy sty, prawie religijny patos — ale z ukrytym jadem, jak paszkwil przepisany na ambonę. Tytuły brzmią jak z manifestów politycznych albo z ksiąg prorockich: rozwlekłe, ceremonialne, z kapitalikami, z myślnikami, z retorycznymi figurami.
 
-Ton: pewny siebie, bezlitosny, ironiczny. Jak ktoś, kto mówi prawdę, której nikt nie chce słyszeć, i robi to z uśmiechem. Kpi z *idei* — nie z ludzi. Kpi z *siebie* — jeszcze chętniej. Stawia mocne tezy, paradoksy, pointille.
+Ton: pewny siebie, bezlitosny, ironiczny. Jak ktoś, kto mówi prawdę, której nikt chce słyszeć, i robi to z uśmiechem. Kpi z *idei* — nie z ludzi. Kpi z *siebie* — jeszcze chętniej. Stawia mocne tezy, paradoksy, pointille.
 
 Tematy, w których czujesz się jak ryba w wodzie: wolna wola, sens życia, polityka jako widowisko, religia po secularizacji, samotność w tłumie, nuda egzystencjalna, niesprawiedliwość, absurd pracy, hipokryzja moralna, AI i ludzkość, tożsamość cyfrowa, przyzwyczajenie do końca świata, ojcostwo w epoce powiadomień, pamięć której nikt nie chciał, przyszłość której nikt nie zamawiał.
 
@@ -92,7 +105,7 @@ const SEEDS: readonly string[] = [
   "Schopenhauer w poczekalni u lekarza",
   "tożsamość rozproszona między pięcioma kartami przeglądarki",
   "Heidegger w kolejce po kebaba",
-  "pamięć jako zdrada, czyli dlaczego nie pamiętasze, co miałeś zjeść",
+  "pamięć jako zdrada, czyli dlaczego nie pamiętasz, co miałeś zjeść",
   "czas linearny jako iluzja ludzi, którzy nie wstają z kanapy",
   "samotność ontologiczna w godzinach szczytu na Discordzie",
   "śmierć Boga i jej dziedzictwo w komentarzach pod filmem",
@@ -220,15 +233,9 @@ function cleanBody(raw: string): string {
 }
 
 /**
- * Pulls a JSON object out of arbitrary model output and returns a cleaned
- * `{ title, body }`. Returns null if anything is missing or unparseable —
- * the caller then falls back to a derived title and the raw text as body.
- *
- * Tries, in order:
- *  1. content between `<<<JSON>>>` and `<<<END>>>` delimiters (legacy
- *     format from older prompts — kept for robustness)
- *  2. the first top-level `{ ... }` object, walking brace depth and
- *     ignoring braces inside strings
+ * Parses the model's JSON output into a cleaned `{ title, body }`.
+ * Returns null if anything is missing or unparseable — the caller then
+ * falls back to a derived title and the raw text as body.
  */
 function parseResponse(raw: string): ManifestoResult | null {
   if (!raw) return null;
@@ -283,8 +290,9 @@ function extractJsonText(raw: string): string | null {
 // -----------------------------------------------------------------------
 
 /**
- * Generates a single manifesto. The caller is expected to have already
- * deferred the reply before invoking this function.
+ * Generates a single manifesto using the OpenAI Responses API.
+ * The caller is expected to have already deferred the reply before invoking
+ * this function.
  */
 export async function runManifesto(
   seedInput: string | null,
@@ -293,18 +301,22 @@ export async function runManifesto(
   const seed = seedInput?.trim() ? seedInput.trim() : pickRandom(SEEDS);
 
   try {
-    const turn = await openai.chat.completions.create({
+    const response = await openai.responses.create({
       model: MANIFESTO_MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: USER_PROMPT(seed) },
-      ],
-      temperature: 1.1,
-      max_tokens: 1400,
-      top_p: 0.95,
+      input: USER_PROMPT(seed),
+      instructions: SYSTEM_PROMPT,
+      text: {
+        format: {
+          type: "json_schema",
+          name: "manifesto",
+          schema: JSON_SCHEMA,
+          strict: true,
+        },
+      },
+      reasoning: { effort: "none" },
     });
 
-    const raw = turn.choices[0]?.message?.content ?? "";
+    const raw = response.output_text ?? "";
     const parsed = parseResponse(raw);
     const result: ManifestoResult = parsed ?? {
       title: deriveTitle(seed),
